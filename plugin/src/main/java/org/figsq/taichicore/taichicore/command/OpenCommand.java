@@ -21,7 +21,7 @@ import static me.fullidle.ficore.ficore.common.api.commands.CommandBuilder.args;
 import static me.fullidle.ficore.ficore.common.api.commands.CommandBuilder.builder;
 
 public class OpenCommand {
-    public static Args<GuiConfig> CONFIG_ARGS = new Args<>() {
+    public static Args<GuiConfig> CONFIG_ARGS = new Args<GuiConfig>() {
         @Override
         public GuiConfig parse(Context context, String s) {
             return GuiConfigManager.configs.stream().filter(config -> config.identity.equals(s)).findFirst().orElse(null);

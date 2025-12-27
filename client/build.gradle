@@ -1,20 +1,37 @@
-apply plugin: 'dev.architectury.loom'
-apply plugin: 'architectury-plugin'
-
+buildscript {
+    repositories {
+        mavenLocal()
+        maven {
+            allowInsecureProtocol = true
+            url = 'http://localhost:31647/snapshots'
+        }
+        maven { url = 'https://repo.spongepowered.org/maven' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:6.0.42'
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
+}
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'eclipse'
+apply plugin: 'java'
+apply plugin: 'org.spongepowered.mixin'
 
 group = 'org.figsq.taichicore.taichicore'
 version = '1.0-SNAPSHOT'
 
-architectury {
-    minecraft = '1.20.1'
-    platformSetupLoomIde()
-    fabric()
+minecraft {
+    mappings channel: 'snapshot', version: '20171003-1.12'
+    accessTransformer 'src/main/resources/META-INF/accesstransformer.cfg'
 }
 
-loom {
-    def file = file('src/main/resources/taichicore.accesswidener')
-    println file.getAbsolutePath()
-    accessWidenerPath = file
+def modid = 'taichicore'
+
+//mixin
+mixin {
+    add sourceSets.main, "mixins.${modid}.refmap.json"
+    config "mixins.${modid}.json"
 }
 
 repositories {
@@ -25,27 +42,47 @@ repositories {
     maven {
         url = uri('https://mcef-download.cinemamod.com/repositories/snapshots')
     }
+    maven { url "https://maven.cleanroommc.com" }
 }
 
 dependencies {
-    minecraft "net.minecraft:minecraft:1.20.1"
-    mappings "net.fabricmc:yarn:1.20.1+build.1:v2"
+    //minecraft
+    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
+    //mixin
+    annotationProcessor 'org.ow2.asm:asm-debug-all:5.2'
+    annotationProcessor 'com.google.guava:guava:32.1.2-jre'
+    annotationProcessor 'com.google.code.gson:gson:2.8.9'
+    implementation('zone.rong:mixinbooter:9.4') {
+        transitive = false
+    }
+    annotationProcessor('zone.rong:mixinbooter:9.4') {
+        transitive = false
+    }
 
-    modImplementation "net.fabricmc:fabric-loader:0.16.14"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:0.92.5+1.20.1"
-
-/*
-    modImplementation 'com.cinemamod:mcef:2.1.6-1.20.1'
-*/
-    modImplementation 'com.cinemamod:mcef-fabric:2.1.6-1.20.1'
+    compileOnly fileTree(dir: 'libs', include: ['**/*.jar'])
 
     pack rootProject.project(":common")
 }
 
 processResources {
-    inputs.property 'version', project.version
+    filteringCharset 'UTF-8'
+    filesMatching('mcmod.info') {
+        expand project.properties
+    }
+}
 
-    filesMatching('fabric.mod.json') {
-        expand version: project.version
+jar.finalizedBy('reobfJar')
+
+jar {
+    manifest {
+        attributes([
+                "Specification-Title"        : "${modid}",
+                "Specification-Version"      : "1",
+                "Implementation-Title"       : rootProject.name,
+                "Implementation-Version"     : "${version}",
+                "Implementation-Timestamp"   : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                "FMLCorePlugin"              : "${group}.CorePlugin",
+                "FMLCorePluginContainsFMLMod": true
+        ])
     }
 }

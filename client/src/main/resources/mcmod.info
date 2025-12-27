@@ -1,0 +1,21 @@
+[
+  {
+    "modid": "taichicore",
+    "name": "${rootProject.name} Mod",
+    "description": "a mod",
+    "version": "${version}",
+    "mcversion": "1.12.2",
+    "forgeversion": "Forge 14.23.5.2860",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "FullIdle"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": [
+      "mcef"
+    ]
+  }
+]

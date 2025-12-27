@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "compatibilityLevel": "JAVA_8",
+  "package": "org.figsq.taichicore.taichicore.mixin",
+  "minVersion": "0.8",
+  "setSourceFile": true,
+  "target": "@env(DEFAULT)",
+  "refmap": "mixins.taichicore.refmap.json",
+  "mixins": [
+  ],
+  "client": [
+  ],
+  "server": [
+  ]
+}
