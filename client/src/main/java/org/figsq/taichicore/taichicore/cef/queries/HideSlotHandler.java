@@ -21,10 +21,11 @@ public class HideSlotHandler implements QueryHandler {
     public boolean handle(CefBrowser browser, CefFrame frame, long queryId, String request, boolean persistent, CefQueryCallback callback) {
         try {
             val currentScreen = MinecraftClient.getInstance().currentScreen;
-            if (!(currentScreen instanceof TaiChiScreen screen)) {
+            if (!(currentScreen instanceof TaiChiScreen)) {
                 callback.failure(1, "Not on TaiChiScreen");
                 return true;
             }
+            val screen = (TaiChiScreen) currentScreen;
             val parent = screen.parent;
             if (parent == null) {
                 callback.failure(1, "No parent");
