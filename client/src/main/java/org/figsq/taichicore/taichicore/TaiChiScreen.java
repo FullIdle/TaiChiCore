@@ -1,15 +1,22 @@
 package org.figsq.taichicore.taichicore;
 
+import com.google.common.cache.AbstractCache;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.montoyo.mcef.MCEF;
-import net.montoyo.mcef.api.API;
 import net.montoyo.mcef.api.IBrowser;
 import net.montoyo.mcef.api.MCEFApi;
+import org.figsq.taichicore.taichicore.cef.queries.DisplaySlotHandler;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import scala.Int;
+
+import java.util.Map;
 
 public class TaiChiScreen extends GuiScreen {
+    public GuiContainer parent;
+    public Map<Integer, DisplaySlotHandler.DisplayArgs> displaySlots;
     IBrowser browser;
     private String urlToLoad;
 
