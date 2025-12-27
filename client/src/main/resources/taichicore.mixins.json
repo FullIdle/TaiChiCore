@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "org.figsq.taichicore.taichicore.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "client": [
+    "MixinMinecraftClient"
+  ],
+  "mixins": [
+    "MixinMCEF",
+    "MixinModScheme"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

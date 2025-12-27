@@ -1,0 +1,10 @@
+name: ${rootProject.name}
+main: ${project.group}.${rootProject.name}
+version: ${project.version}
+api-version: 1.16
+depend:
+  - FICore
+commands:
+  taichicore:
+    description: taichi
+    aliases: [taichi]

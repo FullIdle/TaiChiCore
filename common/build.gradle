@@ -1,0 +1,9 @@
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    compileOnly "com.google.code.gson:gson:2.10"
+    compileOnly "com.google.guava:guava:31.1-jre"
+}

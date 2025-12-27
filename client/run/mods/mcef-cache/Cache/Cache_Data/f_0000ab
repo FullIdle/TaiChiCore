@@ -1,0 +1,1212 @@
+//提醒function
+function warnInfo(tagId, warnInfo) {
+  $("#" + tagId).html(warnInfo);
+  $("#" + tagId).addClass("no");
+  return false;
+}
+
+function removeWarnInfo(tagId) {
+  $("#" + tagId).html("");
+  $("#" + tagId).removeClass("no");
+}
+function isNotValid(condition, warnTagId, info) {
+  if (condition) {
+    warnInfo(warnTagId, info);
+    return false;
+  } else {
+    removeWarnInfo(warnTagId);
+  }
+  return true;
+}
+
+//验证多多号合法性
+
+function validDDIdValud(ddIdValue) {
+  var ddNumVal = ddIdValue;
+  if (ddNumVal.length <= 4 || ddNumVal.length > 11 || isNaN(ddNumVal)) {
+    return false;
+  }
+  if (isNaN(ddNumVal)) {
+    return false;
+  }
+  return true;
+}
+// 这个提供可以不显示错误信息
+function validDDId(tagdd, tagddInfo) {
+  var ddNumVal = $.trim($("#" + tagdd).val());
+  if (!validDDIdValud(ddNumVal)) {
+    if (tagddInfo != "") {
+      $("#" + tagddInfo).html("多多号由5~11位以下数字组成哦！");
+      $("#" + tagddInfo).addClass("no");
+    }
+    return false;
+  } else {
+    if (tagddInfo != "") {
+      $("#" + tagddInfo).html("");
+      $("#" + tagddInfo).removeClass("no");
+    }
+  }
+  return true;
+}
+
+// 验证账号
+function validAccount() {
+  var account = $.trim($("#ddNum").val());
+  if (!isNotValid(account.length == 0, "ddNumShow", "你还没填账号哦！")) {
+    return false;
+  }
+  if (!isNaN(account)) {
+    if (account.length <= 4) {
+      warnInfo("ddNumShow", "请输入正确的多多号！");
+      return false;
+    }
+    if (account.length < 11) {
+      return true;
+    }
+    if (account.length > 11) {
+      warnInfo("ddNumShow", "请输入正确的手机号！");
+      return false;
+    }
+    $.post(
+      "/checkMobileExist.action",
+      { mobileNo: account },
+      function (data) {
+        if (data.resultCode.code == 0) {
+          warnInfo("ddNumShow", "该手机号没有被绑定！请更换一个！");
+          return false;
+        } else if (data.resultCode.code == -22) {
+          warnInfo("ddNumShow", "请求太频繁，请稍后重试");
+          return false;
+        } else {
+          return true;
+        }
+      },
+      "json"
+    );
+  } else if (isEmail(account)) {
+    $.post(
+      "/checkEmailExist.action",
+      { email: account },
+      function (data) {
+        if (data.resultCode.code == 0) {
+          warnInfo("ddNumShow", "该邮箱没有被绑定！请更换一个！");
+          return false;
+        } else {
+          return true;
+        }
+      },
+      "json"
+    );
+  } else {
+    warnInfo("ddNumShow", "请输入正确的邮箱地址！");
+    return false;
+  }
+}
+
+// 个人资料密码申请号
+function validAppNum() {
+  var appNum = $("#appNum").val();
+  return isNotValid(appNum.length <= 0, "reMsg", "你还没填申请号哦！");
+}
+
+//验证码
+function captchas() {
+  var captchasPVal = $.trim($("#captchas").val());
+  return isNotValid(captchasPVal.length == 0, "captchasShow", "请输入验证码！");
+}
+
+// 验证旧密码
+function validOldPwd(tagId, warnTagId, isNullable) {
+  var oldPwd = $("#" + tagId).val();
+  if (oldPwd.length == 0 && isNullable) {
+    removeWarnInfo(warnTagId);
+    return true;
+  }
+  if (!isNotValid(oldPwd.length <= 0, warnTagId, "请填写曾经设置过的密码。")) {
+    return false;
+  }
+  return true;
+}
+
+// 验证新密码
+function validPwd(pid, pInfoid, isNullable) {
+  var ddNumPVal = $("#" + pid).val();
+  if (ddNumPVal.length == 0 && isNullable) {
+    removeWarnInfo(pInfoid);
+    return true;
+  }
+  if (!isNotValid(ddNumPVal.length == 0, pInfoid, "请输入你的密码！")) {
+    return false;
+  }
+  if (
+    !isNotValid(
+      !passwordCheckV1(ddNumPVal),
+      pInfoid,
+      __TIPS.inValidPasswordTips
+    )
+  ) {
+    return false;
+  }
+
+  var instance = new WeakPasswordChecker();
+  var isWeak = instance.isWeak(ddNumPVal);
+  if (
+    !isNotValid(
+      isWeak == true,
+      pInfoid,
+      "这个密码太简单容易被盗号哦，换一个吧~~"
+    )
+  ) {
+    return false;
+  }
+  return true;
+}
+
+// 验证登录密码
+function validLoginPwd(pid, pInfoid, isNullable) {
+  var ddNumPVal = $.trim($("#" + pid).val());
+  if (ddNumPVal.length == 0 && isNullable) {
+    removeWarnInfo(pInfoid);
+    return true;
+  }
+  if (
+    !isNotValid(
+      ddNumPVal.length < 6 || ddNumPVal.length > 16,
+      pInfoid,
+      "请输入6-16位的密码！"
+    )
+  ) {
+    return false;
+  }
+  return true;
+}
+
+//验证两个密码合法与否及其是否匹配
+function validPwds(p1id, p1Infoid, p2id, p2Infoid) {
+  if (!validPwd(p1id, p1Infoid, false) || !validPwd(p2id, p2Infoid, false)) {
+    return false;
+  }
+
+  if (
+    !isNotValid(
+      $("#" + p1id).val() != $("#" + p2id).val(),
+      p2Infoid,
+      "密码不一致，请重新输入！"
+    )
+  ) {
+    $("#" + p2id).val("");
+    $("#" + p1id).val("");
+    return false;
+  }
+
+  return true;
+}
+
+//电话
+function validPhone(tagId, warnTagId, isNullable) {
+  var pVal = $.trim($("#" + tagId).val());
+  if (isNullable && pVal.length <= 0) {
+    removeWarnInfo(warnTagId);
+    return true;
+  }
+  if (!isNotValid(!isPhone(pVal), warnTagId, "请输入正确电话格式!")) {
+    return false;
+  }
+  return true;
+}
+
+//手机号码
+function validMobile(mobileTagId, infoTagId, isNullable) {
+  var mpVal = $.trim($("#" + mobileTagId).val());
+  if (isNullable && mpVal.length <= 0) {
+    removeWarnInfo(infoTagId);
+    return true;
+  }
+  if (!isNotValid(mpVal.length == 0, infoTagId, "你还没填写联系电话哦！")) {
+    return false;
+  }
+  if (!isNotValid(!isMP(mpVal), infoTagId, "请输入正确的联系电话！")) {
+    return false;
+  }
+  return true;
+}
+
+//年龄
+function validAge(tagId, warnTagId, isNullable) {
+  var ageVal = $.trim($("#" + tagId).val());
+  if (isNullable && ageVal.length <= 0) {
+    removeWarnInfo(warnTagId);
+    return true;
+  }
+  if (
+    !isNotValid(
+      isNaN(ageVal) || ageVal < 0,
+      warnTagId,
+      "年龄必须是大于0的数字哦！"
+    )
+  ) {
+    return false;
+  }
+  return true;
+}
+
+//身份证
+function validPerCard(tagId, warnTagId, isNullable) {
+  var perCardVal = $.trim($("#" + tagId).val());
+  if (isNullable && perCardVal.length <= 0) {
+    removeWarnInfo(warnTagId);
+    return true;
+  }
+  if (
+    !isNotValid(
+      !isperCard(perCardVal) || perCardVal.length == 0,
+      warnTagId,
+      "请输入正确的身份证号码！"
+    )
+  ) {
+    return false;
+  }
+  return true;
+}
+
+//QQ
+function validQQ(tagId, warnTagId, isNullable) {
+  var qqVal = $.trim($("#" + tagId).val());
+  if (isNullable && qqVal.length <= 0) {
+    removeWarnInfo(warnTagId);
+    return true;
+  }
+  if (
+    !isNotValid(
+      !isQQ(qqVal) && qqVal.length != 0,
+      warnTagId,
+      "请输入正确的QQ格式！"
+    )
+  ) {
+    return false;
+  }
+  return true;
+}
+
+//出生年月
+function validBirthday(yearTagId, monthTagId, dayTagId, infoTagId, isNullable) {
+  var yearVal = $.trim($("#" + yearTagId).val());
+  var monthVal = $.trim($("#" + monthTagId).val());
+  var dayVal = $.trim($("#" + dayTagId).val());
+  if (
+    isNullable &&
+    yearVal.length == 0 &&
+    monthVal.length == 0 &&
+    dayVal.length == 0
+  ) {
+    removeWarnInfo(infoTagId);
+    return true;
+  }
+  if (
+    !isNotValid(
+      isNaN(yearVal) ||
+        isNaN(monthVal) ||
+        isNaN(dayVal) ||
+        monthVal > 12 ||
+        monthVal < 0 ||
+        dayVal > 31 ||
+        dayVal < 0 ||
+        yearVal < 0,
+      infoTagId,
+      "请输入正确的生日"
+    )
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+//注册日期
+function validRegDate(yearTagId, monthTagId, infoTagId, isNullable) {
+  var yearVal = $.trim($("#" + yearTagId).val());
+  var monthVal = $.trim($("#" + monthTagId).val());
+  if (isNullable && yearVal.length == 0 && monthVal.length == 0) {
+    removeWarnInfo(infoTagId);
+    return true;
+  }
+  if (
+    !isNotValid(
+      isNaN(yearVal) ||
+        isNaN(monthVal) ||
+        monthVal > 12 ||
+        monthVal < 0 ||
+        yearVal < 0,
+      infoTagId,
+      "请输入正确的注册日期!"
+    )
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+//邮编
+function validPost(tagId, infoTagId, isNullable) {
+  var postVal = $.trim($("#" + tagId).val());
+  if (isNullable && postVal.length <= 0) {
+    removeWarnInfo(infoTagId);
+    return true;
+  }
+  if (!isNotValid(postVal.length == 0, infoTagId, "你还没填邮编哦！")) {
+    return false;
+  }
+  if (!isNotValid(!isPost(postVal), infoTagId, "请输入正确的邮编！")) {
+    return false;
+  }
+  return true;
+}
+
+//手机号码
+function validPhone(tagId, infoTagId, isNullable) {
+  var phoneVal = $.trim($("#" + tagId).val());
+  if (isNullable && phoneVal.length <= 0) {
+    removeWarnInfo(infoTagId);
+    return true;
+  }
+  if (!isNotValid(phoneVal.length == 0, infoTagId, "你还没填写手机号码哦！")) {
+    return false;
+  }
+  if (!isNotValid(!isMobile(phoneVal), infoTagId, "请输入正确的手机号码！")) {
+    return false;
+  }
+  return true;
+}
+//电子邮箱
+function validEmail(tagId, infoTagId, isNullable) {
+  var emailVal = $.trim($("#" + tagId).val());
+  if (isNullable && emailVal.length <= 0) {
+    removeWarnInfo(infoTagId);
+    return true;
+  }
+  if (!isNotValid(emailVal.length == 0, infoTagId, "你还没填写电子邮箱哦！")) {
+    return false;
+  }
+  if (!isNotValid(!isEmail(emailVal), infoTagId, "请输入正确的电子邮箱！")) {
+    return false;
+  }
+  return true;
+}
+function validRemail(tagId, infoTagId, rTagId, rInfoTagId, isNullable) {
+  if (!validEmail(rTagId, rInfoTagId, isNullable)) {
+    return false;
+  }
+  var emailVal = $.trim($("#" + tagId).val());
+  var rEmailVal = $.trim($("#" + rTagId).val());
+  if (
+    !isNotValid(
+      emailVal != rEmailVal,
+      rInfoTagId,
+      "两次输入的电子邮箱不一致，请核对后再输入！"
+    )
+  ) {
+    return false;
+  }
+  return true;
+}
+
+//密保问题
+function blurSQ(tagId, infoTagId) {
+  var quesVal = $.trim($("#" + tagId).val());
+  if (
+    !isNotValid(
+      quesVal == "",
+      infoTagId,
+      "你还有未填完的答案哦！请先填完2个问题吧！"
+    )
+  ) {
+    return false;
+  }
+  if (
+    !isNotValid(
+      quesVal.length < 1 || quesVal.length > 16,
+      infoTagId,
+      "答案必须为1-16个字符哦！"
+    )
+  ) {
+    return false;
+  }
+
+  return true;
+}
+function focusSQ(id3) {
+  removeWarnInfo(id3);
+}
+
+/**/
+var $allSelects = null;
+function removeOption(opTagId, opSrcId, removedOtValue) {
+  //, removedOtValue2)
+  var $selTag = $("#" + opTagId);
+  var $selSrc = $("#" + opSrcId);
+
+  var selectVal = $selTag.val();
+  $selTag.empty().append($allSelects.clone());
+
+  $selTag.find("option").each(function () {
+    var _this = $(this);
+    if (_this.text() == removedOtValue) {
+      _this.remove();
+    }
+  });
+  $selTag.val(selectVal);
+}
+
+//选择保密问题
+//function validSelect(tagId, infoTagId, other1TagId, info2TagId, other2TagId, info3TagId){
+function validSelect(tagId, infoTagId, other1TagId, info2TagId) {
+  if ($allSelects == null) {
+    $allSelects = $("#" + tagId)
+      .find("option")
+      .clone();
+  }
+  removeWarnInfo(infoTagId);
+  removeWarnInfo(info2TagId);
+  //removeWarnInfo(info3TagId);
+
+  var select1Val = $.trim($("#" + tagId).val());
+  var select2Val = $.trim($("#" + other1TagId).val());
+  //var select3Val = $.trim($("#"+other2TagId).val());
+
+  /*	*/
+  var select1Text = $("#" + tagId)
+    .find("option:selected")
+    .text();
+  var select2Text = $("#" + other1TagId)
+    .find("option:selected")
+    .text();
+  //var select3Text = $("#"+other2TagId).find("option:selected").text();
+  removeOption(other1TagId, tagId, select1Text);
+  //removeOption(other1TagId, select1Text, select3Text);
+  //removeOption(other2TagId, select1Text, select2Text);
+
+  if (!isNotValid(select1Val == 0, infoTagId, "你还有问题未选择哦！")) {
+    return false;
+  }
+  if (
+    !isNotValid(
+      select1Val == select2Val,
+      infoTagId,
+      "密保问题重复，请设置不同的密保问题！"
+    )
+  ) {
+    return false;
+  }
+  /*if(!isNotValid(select1Val == select3Val, infoTagId, "密保问题重复，请设置不同的密保问题！")){
+		return false; 
+	}
+	*/
+  return true;
+}
+
+//身份证2
+function validPerNumber(tagId, warnTagId, isNullable) {
+  $("#infoShow").text("");
+  var v_card = $.trim($("#" + tagId).val());
+  if (isNullable && v_card.length <= 0) {
+    removeWarnInfo(warnTagId);
+    return true;
+  }
+  var reg = /^\d{17}([0-9Xx])$/;
+  if (!isNotValid(v_card == "", warnTagId, "请输入你的身份证号码！")) {
+    return false;
+  }
+  if (!isNotValid(!reg.test(v_card), warnTagId, "身份证号码输入错误！")) {
+    return false;
+  }
+
+  var area = {
+    11: "北京市",
+    12: "天津市",
+    13: "河北省",
+    14: "山西省",
+    15: "内蒙古自治区",
+    21: "辽宁省",
+    22: "吉林省",
+    23: "黑龙江省",
+    31: "上海市",
+    32: "江苏省",
+    33: "浙江省",
+    34: "安徽省",
+    35: "福建省",
+    36: "江西省",
+    37: "山东省",
+    41: "河南省",
+    42: "湖北省",
+    43: "湖南省",
+    44: "广东省",
+    45: "广西壮族自治区",
+    46: "海南省",
+    50: "重庆市",
+    51: "四川省",
+    52: "贵州省",
+    53: "云南省",
+    54: "西藏自治区",
+    61: "陕西省",
+    62: "甘肃省",
+    63: "青海省",
+    64: "宁夏回族自治区",
+    65: "新疆维吾尔自治区"
+  };
+
+  if (
+    !isNotValid(
+      area[parseInt(v_card.substr(0, 2))] == null,
+      warnTagId,
+      "身份证号码地区码错误！"
+    )
+  ) {
+    return false;
+  }
+
+  if (v_card.length == 18) {
+    var n = new Date();
+    var y = n.getFullYear();
+    if (
+      !isNotValid(
+        parseInt(v_card.substr(6, 4)) < 1900 ||
+          parseInt(v_card.substr(6, 4)) > y,
+        warnTagId,
+        "身份证号码输入错误！"
+      )
+    ) {
+      return false;
+    }
+    var birth =
+      v_card.substr(6, 4) +
+      "-" +
+      v_card.substr(10, 2) +
+      "-" +
+      v_card.substr(12, 2);
+    if (!isNotValid(!isDate(birth), warnTagId, "身份证号码输入错误！")) {
+      return false;
+    }
+    iW = new Array(7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2, 1);
+
+    iSum = 0;
+    for (i = 0; i < 17; i++) {
+      iC = v_card.charAt(i);
+      iVal = parseInt(iC);
+      iSum += iVal * iW[i];
+    }
+
+    var sumCode = ["1", "0", "x", "9", "8", "7", "6", "5", "4", "3", "2"];
+
+    iJYM = iSum % 11;
+
+    sJYM = sumCode[iJYM];
+
+    var cCheck = v_card.charAt(17).toLowerCase();
+    if (!isNotValid(cCheck != sJYM, warnTagId, "身份证号码输入错误！")) {
+      return false;
+    }
+  }
+  removeWarnInfo(warnTagId);
+  return true;
+}
+//日期格式
+function isDate(strDate) {
+  var strSeparator = "-"; //日期分隔符
+  var strDateArray;
+  var intYear;
+  var intMonth;
+  var intDay;
+  var boolLeapYear;
+
+  strDateArray = strDate.split(strSeparator);
+
+  if (strDateArray.length != 3) return false;
+
+  intYear = parseInt(strDateArray[0], 10);
+  intMonth = parseInt(strDateArray[1], 10);
+  intDay = parseInt(strDateArray[2], 10);
+
+  if (isNaN(intYear) || isNaN(intMonth) || isNaN(intDay)) return false;
+
+  if (intMonth > 12 || intMonth < 1) return false;
+
+  if (
+    (intMonth == 1 ||
+      intMonth == 3 ||
+      intMonth == 5 ||
+      intMonth == 7 ||
+      intMonth == 8 ||
+      intMonth == 10 ||
+      intMonth == 12) &&
+    (intDay > 31 || intDay < 1)
+  )
+    return false;
+
+  if (
+    (intMonth == 4 || intMonth == 6 || intMonth == 9 || intMonth == 11) &&
+    (intDay > 30 || intDay < 1)
+  )
+    return false;
+
+  if (intMonth == 2) {
+    if (intDay < 1) return false;
+
+    boolLeapYear = false;
+    if (intYear % 100 == 0) {
+      if (intYear % 400 == 0) boolLeapYear = true;
+    } else {
+      if (intYear % 4 == 0) boolLeapYear = true;
+    }
+
+    if (boolLeapYear) {
+      if (intDay > 29) return false;
+    } else {
+      if (intDay > 28) return false;
+    }
+  }
+
+  return true;
+}
+
+///////////////////////////////////////////////////以上已经校验，以下待校验
+
+function publicError(id1, id2, num1, num2, content1, content2) {
+  var val = $.trim($("#" + id1).val());
+  if (val.length == 0) {
+    $("#" + id2).html(content2);
+    $("#" + id2).addClass("no");
+    return false;
+  }
+  if (
+    (val.length > 0 && val.length != num1 && val.length != num2) ||
+    isNaN(val)
+  ) {
+    $("#" + id2).html(content1);
+    $("#" + id2).addClass("no");
+    return false;
+  } else {
+    $("#" + id2).html("");
+    $("#" + id2).removeClass("no");
+  }
+  return true;
+}
+
+//守护卡
+function gCard() {
+  publicError(
+    "gCard",
+    "gCardShow",
+    12,
+    -1,
+    "守护卡卡号必须是12位的数字哦，请核对后重新填写。",
+    "你还没有填写守护卡卡号哦！"
+  );
+  if (
+    publicError(
+      "gCard",
+      "gCardShow",
+      12,
+      -1,
+      "守护卡卡号必须是12位的数字哦，请核对后重新填写。",
+      "你还没有填写守护卡卡号哦！"
+    )
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function coordinate() {
+  var cD1Val = $.trim($("#cd1").val());
+  var cD2Val = $.trim($("#cd2").val());
+  var cD3Val = $.trim($("#cd3").val());
+
+  var cD1check = (cD1Val.length > 0 && cD1Val.length != 2) || isNaN(cD1Val);
+  var cD2check = (cD2Val.length > 0 && cD2Val.length != 2) || isNaN(cD2Val);
+  var cD3check = (cD3Val.length > 0 && cD3Val.length != 2) || isNaN(cD3Val);
+
+  if (cD1check || cD2check || cD3check) {
+    $("#cdShow").html("你填写的坐标数字不正确，请核对后重新填写。");
+    $("#cdShow").addClass("no");
+    return false;
+  } else {
+    $("#cdShow").html("");
+    $("#cdShow").removeClass("no");
+  }
+  if (cD1Val.length == 0 || cD2Val.length == 0 || cD3Val.length == 0) {
+    $("#cdShow").html("你还有坐标的数字未填写哦！");
+    $("#cdShow").addClass("no");
+    return false;
+  }
+  return true;
+}
+
+//多多卡
+function ddCardLast() {
+  var ddCardval = $.trim($("#ddCard").val());
+  if (!ddCL(ddCardval)) {
+    $("#ddCardShow").html("多多卡卡号后三位数为100或101，请核对后重新填写。");
+    $("#ddCardShow").addClass("no");
+    return false;
+  } else {
+    $("#ddCardShow").html("");
+    $("#ddCardShow").removeClass("no");
+  }
+  return true;
+}
+
+function ddCard() {
+  publicError(
+    "ddCard",
+    "ddCardShow",
+    11,
+    12,
+    "你填写的多多卡卡号长度不正确，请核对后重新填写。",
+    "你还没有填写多多卡卡号哦！"
+  );
+  ddCardLast();
+  if (
+    publicError(
+      "ddCard",
+      "ddCardShow",
+      11,
+      12,
+      "你填写的多多卡卡号长度不正确，请核对后重新填写。",
+      "你还没有填写多多卡卡号哦！"
+    ) &&
+    ddCardLast()
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function ddPsw() {
+  publicError(
+    "ddPsw",
+    "ddPswShow",
+    16,
+    -1,
+    "请输入16位数字型的多多卡密码！",
+    "你还没填写多多卡密码哦！"
+  );
+  if (
+    publicError(
+      "ddPsw",
+      "ddPswShow",
+      16,
+      -1,
+      "请输入16位数字型的多多卡密码！",
+      "你还没填写多多卡密码哦！"
+    )
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function rddPsw() {
+  var ddPswVal = $.trim($("#ddPsw").val());
+  var rddPswVal = $.trim($("#rddPsw").val());
+  if (ddPswVal != rddPswVal) {
+    $("#rddPswShow").html("两次多多卡密码不一致哦!");
+    $("#rddPswShow").addClass("no");
+    return false;
+  } else {
+    $("#rddPswShow").html("");
+    $("#rddPswShow").removeClass("no");
+  }
+  return true;
+}
+
+//真实姓名
+function trueName() {
+  $("#infoShow").text("");
+  var tNVal = $.trim($("#trueName").val());
+  //if(!hasChineseChar(tNVal) || tNVal.length > 10){
+  if ($("#trueName").length > 0) {
+    if (tNVal.length == 0) {
+      $("#trueNameShow").html("请输入正确的真实姓名!");
+      $("#trueNameShow").addClass("no");
+      return false;
+    } else if (tNVal.length > 10) {
+      $("#trueNameShow").html("请输入正确的真实姓名!");
+      $("#trueNameShow").addClass("no");
+      return false;
+    } else {
+      $("#trueNameShow").html("");
+      $("#trueNameShow").removeClass("no");
+    }
+  }
+  $("#trueNameShow").html('<img src="/images/account_validate_ok.png" />');
+  return true;
+}
+
+function delTrueNamePrompt() {
+  $("#trueNameShow").html("");
+  $("#trueName").val("张无忌");
+  $("#trueNameShow").removeClass("no");
+  $("#trueNameShow").html('<img src="/images/account_validate_ok.png" />');
+}
+
+function trueNamePrompt() {
+  $("#trueNameShowPrompt").html(
+    '<a href="javascript:void(0)" onclick="delTrueNamePrompt()" style="color:#2eb405">[张无忌]</a>'
+  );
+}
+
+//身份证号
+
+function isCardID(sId) {
+  var aCity = {
+    11: "北京",
+    12: "天津",
+    13: "河北",
+    14: "山西",
+    15: "内蒙古",
+    21: "辽宁",
+    22: "吉林",
+    23: "黑龙江",
+    31: "上海",
+    32: "江苏",
+    33: "浙江",
+    34: "安徽",
+    35: "福建",
+    36: "江西",
+    37: "山东",
+    41: "河南",
+    42: "湖北",
+    43: "湖南",
+    44: "广东",
+    45: "广西",
+    46: "海南",
+    50: "重庆",
+    51: "四川",
+    52: "贵州",
+    53: "云南",
+    54: "西藏",
+    61: "陕西",
+    62: "甘肃",
+    63: "青海",
+    64: "宁夏",
+    65: "新疆",
+    71: "台湾",
+    81: "香港",
+    82: "澳门",
+    91: "国外"
+  };
+
+  var iSum = 0;
+  var info = "";
+  if (!/^\d{17}(\d|x)$/i.test(sId)) return false;
+  sId = sId.replace(/x$/i, "a");
+  if (aCity[parseInt(sId.substr(0, 2))] == null) return false;
+  sBirthday =
+    sId.substr(6, 4) +
+    "-" +
+    Number(sId.substr(10, 2)) +
+    "-" +
+    Number(sId.substr(12, 2));
+  var d = new Date(sBirthday.replace(/-/g, "/"));
+  if (
+    sBirthday !=
+    d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()
+  )
+    return false;
+  /* for(var i = 17;i>=0;i --) iSum += (Math.pow(2,i) % 11) * parseInt(sId.charAt(17 - i),11) ;
+	 if(iSum%11!=1) return false;*/
+  //aCity[parseInt(sId.substr(0,2))]+","+sBirthday+","+(sId.substr(16,1)%2?"男":"女");//此次还可以判断出输入的身份证号的人性别
+  return true;
+}
+
+function perCardP() {
+  var perCard = $("#perCard").val();
+  if ($("#perCard").length > 0) {
+    if (perCard.length == 0) {
+      $("#perCardShow").html("请输入正确的身份证号！");
+      $("#perCardShow").addClass("no");
+      return false;
+    }
+    if (!isCardID(perCard)) {
+      $("#perCardShow").html("请输入正确的身份证号!");
+      $("#perCardShow").addClass("no");
+      return false;
+    } else {
+      $("#perCardShow").html("");
+      $("#perCardShow").removeClass("no");
+    }
+  }
+  $("#perCardShow").html('<img src="/images/account_validate_ok.png" />');
+  return true;
+}
+
+function perCardPrompt() {
+  $("#perCardShowPrompt").html(
+    '<a href="javascript:void(0)" onclick="delPerCardPrompt()" style="color:#2eb405">[440112199707077452]</a>'
+  );
+}
+
+function delPerCardPrompt() {
+  $("#perCardShow").html("");
+  $("#perCard").val("440112199707077452");
+  $("#perCardShow").removeClass("no");
+  $("#perCardShow").html('<img src="/images/account_validate_ok.png" />');
+}
+//多多号
+
+/**
+ * @param {string} str
+ * @return {boolean}
+ */
+function passwordCheckV1(str) {
+  // 判空
+  if (!str || !str.length) {
+    return false;
+  }
+  // 判空格
+  if (/\s/.test(str)) {
+    return false;
+  }
+  // 有效字符,长度8-16
+  if (!/^[0-9a-zA-Z!@#$%^&*()/~<>?_\-+=]{8,16}$/.test(str)) {
+    return false;
+  }
+  var numReg = /[0-9]/;
+  var letterReg = /[a-zA-Z]/;
+  var specialSymbolReg = /[!@#$%^&*()/~<>?_\-+=]/;
+  // 至少两种组合 A32
+  if (numReg.test(str) && letterReg.test(str)) {
+    return true;
+  }
+  if (numReg.test(str) && specialSymbolReg.test(str)) {
+    return true;
+  }
+  if (letterReg.test(str) && specialSymbolReg.test(str)) {
+    return true;
+  }
+  return false;
+}
+
+var __TIPS = {
+  inValidPasswordTips:
+    "密码由8-16个字符组成，需包含数字、字母、符号!@#$%^&*()/~<>?_-+=中至少2种"
+};
+
+function ddNumP() {
+  var ddNumPVal = $("#ddNumP").val();
+  if (ddNumPVal.length == 0) {
+    $("#ddNumPShow").html("请输入你的密码！");
+    $("#ddNumPShow").addClass("no");
+    return false;
+  }
+  if (!passwordCheckV1(ddNumPVal)) {
+    $("#ddNumPShow").html(__TIPS.inValidPasswordTips);
+    $("#ddNumPShow").addClass("no");
+    return false;
+  }
+  var instance = new WeakPasswordChecker();
+  if (instance.isWeak(ddNumPVal)) {
+    $("#ddNumPShow").html("这个密码太简单容易被盗号哦，换一个吧~~");
+    $("#ddNumPShow").addClass("no");
+    return false;
+  } else {
+    $("#ddNumPShow").html("");
+    $("#ddNumPShow").removeClass("no");
+  }
+  $("#ddNumPShow").html('<img src="/images/account_validate_ok.png" />');
+  return true;
+}
+function rddNumP() {
+  var ddNumPVal = $("#ddNumP").val();
+  var rddNumPVal = $("#rddNumP").val();
+  if (rddNumPVal.length == 0) {
+    $("#rddNumPShow").html("请再次输入你的密码哦！");
+    $("#rddNumPShow").addClass("no");
+    return false;
+  }
+  if (ddNumPVal != rddNumPVal) {
+    $("#rddNumPShow").html("两次输入的密码不一致哦！");
+    $("#rddNumPShow").addClass("no");
+    return false;
+  } else {
+    $("#rddNumPShow").html("");
+    $("#rddNumPShow").removeClass("no");
+  }
+  $("#rddNumPShow").html('<img src="/images/account_validate_ok.png" />');
+  return true;
+}
+
+// 2022年7月7日14:47:43 未搜到本站使用该函数
+function ddNumP2() {
+  var ddNumP2Val = $.trim($("#ddNumP2").val());
+  if (ddNumP2Val.length == 0) {
+    $("#ddNumP2Show").html("请输入你的新密码哦！");
+    $("#ddNumP2Show").addClass("no");
+    return false;
+  }
+  if (!hasPassword(ddNumP2Val)) {
+    $("#ddNumP2Show").html("请输入6-16个字符的密码哦！");
+    $("#ddNumP2Show").addClass("no");
+    return false;
+  } else {
+    $("#ddNumP2Show").html("");
+    $("#ddNumP2Show").removeClass("no");
+  }
+  return true;
+}
+// 2022年7月7日14:47:43 未搜到本站使用该函数
+function rddNumP2() {
+  var ddNumP2Val = $.trim($("#ddNumP2").val());
+  var rddNumP2Val = $.trim($("#rddNumP2").val());
+  if (rddNumP2Val.length == 0) {
+    $("#rddNumP2Show").html("请再次输入你的新密码哦！");
+    $("#rddNumP2Show").addClass("no");
+    return false;
+  }
+  if (ddNumP2Val != rddNumP2Val) {
+    $("#rddNumP2Show").html("两次输入的密码不一致哦！");
+    $("#rddNumP2Show").addClass("no");
+    return false;
+  } else {
+    $("#rddNumP2Show").html("");
+    $("#rddNumP2Show").removeClass("no");
+  }
+  return true;
+}
+
+function captchaserr() {
+  $("#captchasShow").html("验证码错误,请重新输入!");
+  $("#captchasShow").addClass("no");
+}
+
+//按确定
+$(function () {
+  $("#submit2").click(function () {
+    $("#cd1").focus();
+    $("#gCard").focus();
+    $("#cd1").blur();
+    $("#gCard").blur();
+  });
+  $("#submit3").click(function () {
+    $("#ddNumP2").blur();
+    $("#rddNumP2").blur();
+    $("body").focus();
+  });
+  $("#submit4").click(function () {
+    $("#ddPsw").focus();
+    $("#trueName").focus();
+    $("#mobile").focus();
+    $("#phone").focus();
+    $("#phone").blur();
+  });
+  $("#submit5").click(function () {
+    $("#trueName").blur();
+    $("#ddNumP").blur();
+    $("#rddNumP").blur();
+    $("#captchas").blur();
+  });
+  $("#submit6").click(function () {
+    $("#email").focus();
+    $("#email").blur();
+    $("#remail").focus();
+    $("#remail").blur();
+    $("body").focus();
+  });
+  $("#submit7").click(function () {
+    $("#email").blur();
+    //$("#post").blur();
+    $("#mp").blur();
+  });
+  $("#submit8").click(function () {
+    $("#applyN").blur();
+  });
+  $("#submit9").click(function () {
+    $("#ddCard").blur();
+    $("#ddPsw").blur();
+  });
+});
+
+$("#submit3").click(function () {
+  $("#ddNumP").blur();
+  $("#rddNumP").blur();
+  $("body").focus();
+});
+
+//test
+function checkForm() {
+  if (userName() && ddCardNum()) {
+    return true;
+  } else {
+    return false;
+  }
+}
+//安全评分
+function setStar(score, isTips) {
+  var scoreShow;
+  var scoreLevel;
+  var tips;
+  if (score == 0) {
+    scoreShow = "grade_lower";
+    scoreLevel = "极低";
+    tips =
+      "你现在的账号很不安全，如果被盗，很难找回密码。建议你尽快完善个人资料，并采取密码保护措施。";
+  } else if (score <= 60) {
+    scoreShow = "grade_low";
+    scoreLevel = "低";
+    tips =
+      "你现在的账号很不安全，如果被盗，很难找回密码。建议你尽快完善个人资料，并采取密码保护措施。";
+  } else if (score <= 80) {
+    scoreShow = "grade_middle";
+    scoreLevel = "中";
+    tips =
+      "你的帐号比较安全，请继续保持良好的帐号保护习惯。<br/>不要随便告诉别人自己的密码、更不要告诉别人密码保护问题哦！";
+  } else {
+    scoreShow = "grade_high";
+    scoreLevel = "高";
+    tips =
+      "在你的细心呵护下，你的帐号目前有较高的安全度，请继续保持良好的帐号保护习惯。";
+  }
+  $("#starShow .grade_base").addClass(scoreShow);
+  $("#scoreShow").addClass(scoreShow + "_title");
+  $("#scoreShow").prepend(scoreLevel);
+  if (tips) $("#scoreTips").append(tips);
+}
+
+/*手机号码验证*/
+function DoValid(id, tipId, type) {
+  var val = $.trim($(id).val()),
+    flag = false;
+  if (type == "phone") {
+    if (!isMobile(val)) {
+      $(tipId).html("请输入正确的手机号码！");
+      flag = true;
+    }
+  } else if (type == "email") {
+    if (!isEmail(val)) {
+      $(tipId).html("请输入正确的电子邮箱！");
+      flag = true;
+    }
+  } else if (type == "phoneValidCode") {
+    if (val.length == 0) {
+      $(tipId).html("请输入手机验证码！");
+      flag = true;
+    }
+  } else if (type == "validCode") {
+    if (val.length == 0) {
+      $(tipId).html("请输入验证码！");
+      flag = true;
+    }
+  }
+  if (flag) {
+    $(tipId).addClass("no");
+    return false;
+  }
+  $(tipId).html("");
+  $(tipId).removeClass("no");
+  $(tipId).html('<img src="/images/account_validate_ok.png" />');
+  return true;
+}

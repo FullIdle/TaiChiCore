@@ -1,0 +1,13 @@
+#标识  可以通过命令给指定玩家打开指定标识的ui(不管任何类型)
+identity: example
+#类型 覆盖重写 overwrite 独立的ui independent (独立的match是无效的)
+#重写就是覆盖已有个bukkit inventory，更具配置的match匹配容器名进行替换
+#独立的UI只能通过命令直接打开
+type: overwrite
+#匹配容器名，用于匹配bukkit inventory, 暂默认精准匹配
+match: 自定义GUI1
+# url    {resource} 客户端侧资源包文件夹的绝对路径，尾部没有/需要手动写!
+#url: file://{resource}/gui/example.html 客户端文件路径
+#url: 'mod://taichicore/main.html' 客户端模组资源文件 格式: jar文件内 /assets/taichicore/html/main.html (示例)
+#url: https://example.com/example.html 客户端网页路径(搞前端写起来更快更舒服，跟好操作)
+url: 'mod://taichicore/main.html'

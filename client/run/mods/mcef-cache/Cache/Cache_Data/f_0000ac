@@ -1,0 +1,538 @@
+function turnOffAutoComplete() {
+  var e = document.getElementById("autocompleteOff");
+  e.setAttribute("autocomplete", "off");
+}
+function onKeyDown(e) {
+  13 == e.keyCode && login();
+}
+function validParam() {
+  var e = $.trim($("#ddCard").val());
+  $.trim($("#ddPsw").val()), $.trim($("#captchas").val());
+  return 0 == e.length ? !1 : validLoginPwd("ddPsw", "ddPswShow", !1) ? !!captchas() : !1;
+}
+function getUrlParams(e) {
+  if (-1 == e.indexOf("?")) return null;
+  e = e.split("?")[1].split("#")[0];
+  var n = e.split("&"),
+    a = "",
+    t = {};
+  return (
+    $(n).each(function (e, n) {
+      (a = n.split("=")), (t[a[0]] = a[1]);
+    }),
+    t
+  );
+}
+function indexCheckLogin(callback) {
+  var url = "/access/ajCheckLogin.action";
+  $.get(
+    url,
+    function cbf(data) {
+      var user = eval("(" + data + ")");
+      if (null != user && "yes" == user.isValid) {
+        hasLogin = 1;
+        var $ff = $("#showAccount");
+        user.account.indexOf("@") > -1
+          ? $ff.text(" 邮箱：" + user.account + " (" + user.duoduoId + ")")
+          : 11 == user.account.length
+          ? $ff.text(" 手机号：" + user.account + " (" + user.duoduoId + ")")
+          : $ff.text(" 多多号：" + user.account),
+          $("#lbDuoduoId").text(user.duoduoId),
+          initLoginState();
+      }
+    },
+    "json"
+  );
+}
+function login() {
+  if (validParam()) {
+    $("#ddCardShow").html(""), $("#ddPswShow").html("");
+    var url = "/access/ajaxLogin.action",
+      ddIdValue = $.trim($("#ddCard").val()),
+      passwordValue = $("#ddPsw").val(),
+      imageCodeValue = $.trim($("#captchas").val()),
+      params = getUrlParams(window.top.location.href),
+      gId = "";
+    params && params.gId && (gId = gId);
+    var params = { account: ddIdValue, password: passwordValue, imgCode: imageCodeValue, gId: gId };
+    injectUnsubscribeTipBeforeLogin($.post(url, params)).done(function (data) {
+      var user = eval("(" + data + ")");
+      if (null !== user) {
+        if (user.isValid == "yes") {
+          self.parent.showUserHasLogin(user.duoduoId, user);
+          self.parent.tb_remove();
+        } else if (user.resultCode && user.resultCode.code == -24) {
+          $("#codeImg").attr("src", "/access/imgCodeGetter.action?r=" + Math.floor(10 * Math.random()));
+          $("#captchasShow").html(user.info);
+          $("#captchasShow").css("color", "red");
+        } else {
+          $("#codeImg").attr("src", "/access/imgCodeGetter.action?r=" + Math.floor(10 * Math.random()));
+          $("#captchasShow").html(user.info);
+          $("#captchasShow").addClass("no");
+        }
+      }
+    });
+  }
+  function injectUnsubscribeTipBeforeLogin(event) {
+    var defer = $.Deferred();
+    event.done(function (data) {
+      try {
+        var user = eval("(" + data + ")");
+        if (user && user.state == 1) {
+          $("#captchasShow")
+            .html("当前多多号处于申请注销中，如需继续游戏，请前往账户中心撤销注销")
+            .addClass("no")
+            .parent()
+            .prev()
+            .remove();
+          setTimeout(function () {
+            defer.resolve(data);
+          }, 2500);
+          return;
+        }
+      } catch (error) {}
+      defer.resolve(data);
+    });
+    return defer;
+  }
+}
+function isIdCardUsed() {
+  var url = "/idcard/ajaxIdCard.action",
+    idCardValue = $.trim($("#perCard").val()),
+    params = { idCard: idCardValue };
+  $.post(
+    url,
+    params,
+    function cbf(data) {
+      var user = eval("(" + data + ")");
+      if (null != user)
+        return "yes" == user.isValid
+          ? (setHtmlStatus(!0, user.age), !0)
+          : "no" == user.isValid
+          ? (setHtmlStatus(!1, user.age), !1)
+          : void 0;
+    },
+    "json"
+  );
+}
+function initLoginState() {
+  if (hasLogin == "") {
+    $("#sLogout").hide();
+    $("#aLogin").show();
+    $("#qqLogin").show();
+    $("#wxLogin").show();
+    $(".login_bar").fadeIn();
+  } else {
+    var hl = Number(hasLogin);
+    if (hl == 1) {
+      $("#sLogout").show();
+      $("#aLogin").hide();
+      $("#qqLogin").hide();
+      $("#wxLogin").hide();
+    } else {
+      $("#sLogout").hide();
+      $("#aLogin").show();
+      $("#qqLogin").show();
+      $("#wxLogin").show();
+    }
+    $(".login_bar").fadeIn();
+  }
+}
+function initNavIndex(e) {
+  $("#header .nav a").eq(e).addClass("on");
+}
+function checkLogin(redirectUrl) {
+  if (
+    ((duoduoValue = $.trim($("#lbDuoduoId").text())),
+    validDDIdValud(duoduoValue) || (duoduoValue = ""),
+    (readyUrl = redirectUrl),
+    isEmpty(duoduoValue))
+  )
+    return void $("#aLogin").click();
+  var url = "/access/ajCheckLogin.action",
+    params = { duoduoId: duoduoValue };
+  $.post(
+    url,
+    params,
+    function (data) {
+      var user = eval("(" + data + ")");
+      "yes" == user.isValid ? showUserHasLogin(user.duoduoId, user) : $("#aLogin").click();
+    },
+    "json"
+  );
+}
+function showUserHasLogin(duoduoId, loginResData) {
+  $("#sLogout").show();
+  $("#aLogin").hide();
+  $("#qqLogin").hide();
+  $("#lbDuoduoId").text(duoduoId);
+  var gotoUrl = readyUrl || "/index.action";
+  try {
+    // 是经其他站点的弱密提示跳转过来的，登录之后就不需要再展示弱密提示了
+    if (!~parent.location.search.indexOf("__toUpdatePwd=true")) {
+      if (loginResData && loginResData.weakPwd) {
+        if (!!~gotoUrl.indexOf("?")) {
+          gotoUrl += "&weakPwd=true";
+        } else {
+          gotoUrl += "?weakPwd=true";
+        }
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+  requestUrl(gotoUrl);
+}
+function requestUrl(e, blank) {
+  blank = blank || false;
+  (duoduoValue = $.trim($("#lbDuoduoId").text())), validDDIdValud(duoduoValue) || (duoduoValue = "0");
+  var n = "";
+  n = e.indexOf("?") > 0 ? "&" : "?";
+  var url = e + n + "duoduoId=" + duoduoValue + "&gId=" + ($("#accountGameId").val() >>> 0); // >>> 0 转Number类型
+  if (blank) {
+    window.open(url, "_blank");
+  } else {
+    self.location = url;
+  }
+}
+function postParameters(e) {
+  var n = new Date().valueOf() % 100;
+  e = e.indexOf("?") > 0 ? e + "&" + n : e + "?" + n;
+  var a = window.document.createElement("form");
+  (a.method = "post"), (a.id = "parasForm"), (a.name = "name"), (a.gId = $("#accountGameId").val()), (a.action = e);
+  var t = 0;
+  for (t = (arguments.length - 1) / 2, index = 0; index < t; index++) {
+    var o = window.document.createElement("input");
+    (o.name = arguments[2 * index + 1]), (o.value = arguments[2 * index + 2]), a.appendChild(o);
+  }
+  document.body.appendChild(a), a.submit();
+}
+function refreshcode() {
+  var e = $("img[name=imgCode]:visible");
+  0 == e.length && (e = $("#codeImg")), (e[0].src = "/access/imgCodeGetter.action?r=" + Math.floor(10 * Math.random()));
+}
+function addCookie() {
+  if (document.all) window.external.addFavorite(siteDNSName, siteShortName);
+  else
+    try {
+      window.sidebar.addPanel(siteShortName, siteDNSName, "");
+    } catch (e) {
+      alert("加入收藏失败，请使用Ctrl+D进行添加");
+    }
+}
+function setHomepage() {
+  if (document.all) (document.body.style.behavior = "url(#default#homepage)"), document.body.setHomePage(siteDNSName);
+  else if (window.sidebar) {
+    if (window.netscape)
+      try {
+        netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+      } catch (e) {
+        alert(
+          "此操作被浏览器拒绝！\n请在浏览器地址栏输入“about:config”并回车\n然后将 [signed.applets.codebase_principal_support]的值设置为'true',双击即可。"
+        );
+      }
+    var n = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
+    n.setCharPref("browser.startup.homepage", siteDNSName);
+  }
+}
+function ppType() {
+  4 == $("#pp_type").val() && $("#table_div table").eq(3).show().siblings().hide(),
+    3 == $("#pp_type").val() && $("#table_div table").eq(2).show().siblings().hide(),
+    2 == $("#pp_type").val() && $("#table_div table").eq(1).show().siblings().hide(),
+    1 == $("#pp_type").val() && $("#table_div table").eq(0).show().siblings().hide();
+}
+function cdNext() {
+  $("#cd1").keyup(function () {
+    2 == $("#cd1").val().length && $("#cd2").focus();
+  }),
+    $("#cd2").keyup(function () {
+      2 == $("#cd2").val().length && $("#cd3").focus();
+    });
+}
+function birthNext() {
+  $("#year").keyup(function () {
+    4 == $("#year").val().length && $("#month").focus();
+  }),
+    $("#month").keyup(function () {
+      2 == $("#month").val().length && $("#day").focus();
+    });
+}
+function template(e, n, a) {
+  return e.replace(a || /\${([^{}]*)}/g, function (e, a) {
+    return (void 0 !== n[a] && null !== n[a] && n[a].toString()) || "";
+  });
+}
+function lockScreen(e) {
+  "undefined" == typeof e || e
+    ? $("#suoping")
+        .css({
+          opacity: "0.65",
+          height: $(document).height()
+        })
+        .show()
+    : $("#suoping").hide();
+}
+function getEmailSendWin(e) {
+  var n =
+      '<p style="padding:60px 0 10px 0;"><span>' +
+      e +
+      '</span></p><p style="padding:0px 0 30px 0;">请进入邮箱确认，邮箱有误点此<span>更换邮箱</span>/p>',
+    a = "http://mail." + mail.split("@")[1],
+    t = new PopWin({
+      title: "提示",
+      main: n,
+      mailBtn: !0,
+      init: function () {
+        $("#" + t.id + " .enter_mail_btn").attr("href", a);
+      }
+    });
+  return t;
+}
+function phoneTimer(e, n) {
+  function a() {
+    o(),
+      $(c).hasClass("phone_validate_btn_disable") || $(c).addClass("phone_validate_btn_disable"),
+      $(c).empty().append("<span>再次发送（<i>60</i>秒）</span>");
+    var e = $(c).find("i");
+    l = setInterval(function () {
+      e.text(--g), 0 == g && o();
+    }, 1e3);
+  }
+
+  function t() {
+    var e = s();
+    e.show();
+  }
+
+  function o() {
+    $(c).empty(), (g = "60"), (u = !1), clearInterval(l), $(c).removeClass("phone_validate_btn_disable");
+  }
+
+  function i(e) {
+    var t = {};
+    (t = f
+      ? { gId: _gId, mobileNo: $(p).val(), duoduoId: $.trim($("#lbDuoduoId").text()) }
+      : {
+          gId: _gId,
+          mobileNo: $(p).val()
+        }),
+      $.post(
+        r,
+        t,
+        function (e) {
+          var t = e;
+          0 == t.resultCode.code &&
+            ((u = !0),
+            a(),
+            (n.isAble = !0),
+            $(h).empty().removeClass("no").append('<img src="/images/account_validate_ok.png">发送成功')),
+            t.resultCode.code < 0 &&
+              (-7 == t.resultCode.code && requestUrl("/login2.jsp"),
+              1 == t.imageCodeRequired && m.show(),
+              $(h).addClass("no").text(t.resultCode.detail),
+              $(c).empty().removeClass("phone_validate_btn_disable"));
+        },
+        "json"
+      );
+  }
+
+  function d() {
+    var e = {};
+    (e = f
+      ? {
+          gId: _gId,
+          mobileNo: $(p).val(),
+          duoduoId: $.trim($("#lbDuoduoId").text()),
+          imgCode: $("#imgCode").val()
+        }
+      : { gId: _gId, mobileNo: $(p).val(), imgCode: $("#imgCode").val() }),
+      $.post(
+        r,
+        e,
+        function (e) {
+          var t = e;
+          t.resultCode.code < 0 &&
+            (-7 == t.resultCode.code && requestUrl("/login2.jsp"),
+            refreshcode(),
+            $("#" + m.id)
+              .find(".box_tips")
+              .addClass("no")
+              .show()
+              .text(t.resultCode.detail)),
+            0 == t.resultCode.code &&
+              ($(h).empty().removeClass("no").append('<img src="/images/account_validate_ok.png">发送成功'),
+              $("#" + m.id).hide(),
+              $(".popBox:visible").length || lockScreen(!1),
+              a(),
+              (n.isAble = !0));
+        },
+        "json"
+      );
+  }
+
+  function s() {
+    var e =
+        '<p class="phoneValidateInfo">请输入验证码，完成手机短信发送：</p><div><div><input class="form_box input_small" maxlength="4" type="text" name="imgCode" id="imgCode"/><img id="codeImg" name="imgCode" src="/access/imgCodeGetter.action" width="75" height="30" align="absmiddle"></div><p class="box_tips no" style="display:none"></p></div>',
+      n = new PopWin({
+        title: "提示",
+        main: e,
+        okBtn: !0,
+        cancelBtn: !0,
+        showFun: function () {
+          refreshcode(),
+            $("#" + m.id)
+              .find("#imgCode")
+              .val(""),
+            $("#" + m.id)
+              .find(".box_tips")
+              .removeClass("no")
+              .empty(),
+            lockScreen(),
+            $("#" + m.id).show();
+        },
+        okFun: function () {
+          $.publish("phone.sendValidateDate");
+        },
+        cancelFun: function () {
+          $(h).removeClass("no").text(""), $("#" + m.id).hide(), $(".popBox:visible").length || lockScreen(!1);
+        },
+        closeFun: function () {
+          $(h).removeClass("no").text(""), $("#" + m.id).hide(), $(".popBox:visible").length || lockScreen(!1);
+        }
+      });
+    return n;
+  }
+
+  var l = null,
+    r = e.url,
+    u = !1,
+    c = e.btnID,
+    p = e.bindInput,
+    h = e.bindInputShow,
+    m = s(),
+    f = e.noApply || !1,
+    g = "60";
+  return (
+    $.subscribe("phone.sendData", i),
+    $.subscribe("phone.validate", t),
+    $.subscribe("phone.sendValidateDate", d),
+    $("body").on("click", c, function () {
+      $(c).hasClass("phone_validate_btn_disable") ||
+        (0 == u &&
+          DoValid(p, h, "phone") &&
+          ($(c).addClass("phone_validate_btn_disable").append("<span>发送验证码到手机</span>"), $.publish("phone.sendData")));
+    }),
+    { runTime: a }
+  );
+}
+var o = $({});
+($.subscribe = function () {
+  o.on.apply(o, arguments);
+}),
+  ($.unsubscribe = function () {
+    o.off.apply(o, arguments);
+  }),
+  ($.publish = function () {
+    o.trigger.apply(o, arguments);
+  }),
+  (function (e) {
+    e.fn.placeholder = function () {
+      var e = this,
+        n = e.attr("placeholder"),
+        a = e.attr("type");
+      "password" == a
+        ? e.attr("placeholder", "")
+        : "placeholder" in document.createElement("input")
+        ? e
+            .bind("focus", function () {
+              jQuery(this).attr("placeholder") == n && jQuery(this).attr("placeholder", "");
+            })
+            .bind("blur", function () {
+              jQuery(this).attr("placeholder", "") && jQuery(this).attr("placeholder", n);
+            })
+        : e
+            .removeAttr("placeholder")
+            .val(n)
+            .bind("focus", function () {
+              this.value == n && (this.value = "");
+            })
+            .bind("blur", function () {
+              "" == this.value && (this.value = n);
+            });
+    };
+  })(jQuery);
+var loginPage = "/login.html?placeValuesBeforeTB_=savedValues&TB_iframe=true&height=340&width=460&modal=true";
+$(function () {
+  $("#aLogin").attr("href", loginPage),
+    $("body").append('<div id="suoping"></div>'),
+    $("body").on("click", "img[name=imgCode]", function () {
+      this.src = "/access/imgCodeGetter.action?r=" + Math.floor(10 * Math.random());
+    });
+});
+var readyUrl,
+  siteDNSName = location.protocol + "//account.100bt.com",
+  siteShortName = "百田帐号中心";
+Math.guid = function () {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+    .replace(/[xy]/g, function (e) {
+      var n = (16 * Math.random()) | 0,
+        a = "x" == e ? n : (3 & n) | 8;
+      return a.toString(16);
+    })
+    .toUpperCase();
+};
+var PopWin = function (e) {
+  (this.id = Math.guid()), (e.id = this.id);
+  var n = {
+    okBtn: !1,
+    cancelBtn: !1,
+    mailBtn: !1,
+    closeFun: function () {
+      $("#" + e.id).hide(), $(".popBox:visible").length || lockScreen(!1);
+    },
+    showFun: function () {
+      lockScreen(), $("#" + e.id).show();
+    },
+    okFun: function () {},
+    cancelFun: function () {},
+    mailFun: function () {},
+    init: function () {}
+  };
+  (e = $.extend(n, e)),
+    this._initWin(e),
+    (this.getCloseFun = function () {
+      e.closeFun();
+    }),
+    (this.getShowFun = function (n) {
+      n && n(), e.showFun();
+    });
+};
+PopWin.prototype = {
+  _initWin: function (e) {
+    var n =
+        '<div class="popBox" id="${id}"><p class="title clearfix"><span>${title}</span><span class="close"></span></p><div class="main">${main}</div><div class="buttonGroup"></div></div>',
+      a = {
+        id: e.id,
+        title: e.title,
+        main: e.main
+      };
+    $("body").append(template(n, a));
+    var t = $("#" + e.id);
+    e.okBtn &&
+      (t.find(".buttonGroup").append('<a href="javascript:void(0);" class="btn ok_btn"></a>'), t.on("click", ".ok_btn", e.okFun)),
+      e.cancelBtn &&
+        (t.find(".buttonGroup").append('<a href="javascript:void(0);" class="btn cancel_btn ml20"></a>'),
+        t.on("click", ".cancel_btn", e.cancelFun)),
+      e.mailBtn &&
+        (t.find(".buttonGroup").append('<a target="_blank" href="javascript:void(0);" class="btn enter_mail_btn"></a>'),
+        t.on("click", ".enter_mail_btn", e.mailFun)),
+      t.on("click", ".close", e.closeFun),
+      e.init();
+  },
+  show: function (e) {
+    this.getShowFun(e);
+  },
+  close: function () {
+    this.getCloseFun();
+  }
+};
