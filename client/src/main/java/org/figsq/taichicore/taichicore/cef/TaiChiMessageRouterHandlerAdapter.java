@@ -7,9 +7,7 @@ import org.cef.browser.CefFrame;
 import org.cef.browser.CefMessageRouter;
 import org.cef.callback.CefQueryCallback;
 import org.cef.handler.CefMessageRouterHandlerAdapter;
-import org.figsq.taichicore.taichicore.cef.queries.ClickSlotHandler;
-import org.figsq.taichicore.taichicore.cef.queries.DisplaySlotHandler;
-import org.figsq.taichicore.taichicore.cef.queries.HideSlotHandler;
+import org.figsq.taichicore.taichicore.cef.queries.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,5 +43,7 @@ public class TaiChiMessageRouterHandlerAdapter extends CefMessageRouterHandlerAd
         HANDLERS.add(ClickSlotHandler.INSTANCE);
         HANDLERS.add(DisplaySlotHandler.INSTANCE);
         HANDLERS.add(HideSlotHandler.INSTANCE);
+        HANDLERS.add(ChatHandler.INSTANCE);
+        HANDLERS.add(CommandHandler.INSTANCE);
     }
 }
