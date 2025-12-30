@@ -6,13 +6,37 @@
     <title>TaiChiDemo</title>
 </head>
 <style>
+    * {
+        /*刚刚调的时间太快，快到0.1秒都没有*/
+        transition: all 1.0s;/*过度动画所用时长*/
+    }
     body {
         text-align: center;
-        background-color: rgba(0,0,0,0);
+        /*半透明黑色*/
+        background-color: rgba(0,0,0,0);/*底层背景颜色*/
+    }
+    h1 {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+    h1:hover {/*鼠标悬浮在h1元素时*/
+        transform: rotate(90deg);/*旋转九十度*/
+        color: red;
+        background-color: rgba(0,0,0,1);
     }
 </style>
 <body>
     <h1>你好,TaiChiCore</h1>
     <img src="demo.jpg" alt="">
 </body>
+<script>
+    window.cefQuery({
+        request: 'displaySlot(0,10,10,1,1,1)',
+        onSuccess: function(response) {
+
+        },
+        onFailure: function(error_code, error_message) {
+
+        }
+    })
+</script>
 </html>

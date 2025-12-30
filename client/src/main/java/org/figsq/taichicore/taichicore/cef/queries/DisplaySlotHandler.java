@@ -1,7 +1,7 @@
 package org.figsq.taichicore.taichicore.cef.queries;
 
 import lombok.val;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import org.cef.browser.CefBrowser;
 import org.cef.browser.CefFrame;
 import org.cef.callback.CefQueryCallback;
@@ -20,12 +20,12 @@ public class DisplaySlotHandler implements QueryHandler {
     @Override
     public boolean handle(CefBrowser browser, CefFrame frame, long queryId, String request, boolean persistent, CefQueryCallback callback) {
         try {
-            val client = MinecraftClient.getInstance();
-            if (!(client.currentScreen instanceof TaiChiScreen)) {
+            val client = Minecraft.getInstance();
+            if (!(client.screen instanceof TaiChiScreen)) {
                 callback.failure(1, "Not in Tai Chi Screen");
                 return true;
             }
-            val screen = (TaiChiScreen) client.currentScreen;
+            val screen = (TaiChiScreen) client.screen;
             val parent = screen.parent;
             if (parent == null) {
                 callback.failure(1, "No parent");

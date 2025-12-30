@@ -1,7 +1,7 @@
 package org.figsq.taichicore.taichicore.cef.queries;
 
 import lombok.val;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import org.cef.browser.CefBrowser;
 import org.cef.browser.CefFrame;
 import org.cef.callback.CefQueryCallback;
@@ -20,7 +20,7 @@ public class HideSlotHandler implements QueryHandler {
     @Override
     public boolean handle(CefBrowser browser, CefFrame frame, long queryId, String request, boolean persistent, CefQueryCallback callback) {
         try {
-            val currentScreen = MinecraftClient.getInstance().currentScreen;
+            val currentScreen = Minecraft.getInstance().screen;
             if (!(currentScreen instanceof TaiChiScreen)) {
                 callback.failure(1, "Not on TaiChiScreen");
                 return true;
