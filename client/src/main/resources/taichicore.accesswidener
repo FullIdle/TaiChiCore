@@ -1,4 +1,3 @@
 accessWidener v2 named
-accessible field net/minecraft/client/gui/screen/ingame/HandledScreen y I
-accessible field net/minecraft/client/gui/screen/ingame/HandledScreen x I
-accessible method net/minecraft/client/gui/screen/ingame/HandledScreen drawItem (Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V
+accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen leftPos I
+accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen topPos I

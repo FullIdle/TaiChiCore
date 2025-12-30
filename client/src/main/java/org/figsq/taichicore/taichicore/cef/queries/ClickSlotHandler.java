@@ -1,7 +1,7 @@
 package org.figsq.taichicore.taichicore.cef.queries;
 
 import lombok.val;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import org.cef.browser.CefBrowser;
 import org.cef.browser.CefFrame;
 import org.cef.callback.CefQueryCallback;
@@ -26,8 +26,8 @@ public class ClickSlotHandler implements QueryHandler {
                 return true;
             }
             val index = Integer.parseInt(args[0]);
-            val client = MinecraftClient.getInstance();
-            val screen = client.currentScreen;
+            val client = Minecraft.getInstance();
+            val screen = client.screen;
             if (!(screen instanceof TaiChiScreen)) {
                 callback.failure(0, "Not on a TaiChi screen");
                 return true;
@@ -38,12 +38,12 @@ public class ClickSlotHandler implements QueryHandler {
                 callback.failure(1, "TaiChi screen has a parent");
                 return true;
             }
-            val slot = container.getScreenHandler().getSlot(index);
+            val slot = container.getMenu().getSlot(index);
             if (slot == null) {
                 callback.failure(2, "Invalid slot number");
                 return true;
             }
-            callback.success(String.valueOf(container.mouseClicked(slot.x + container.x, slot.y + container.y, 0) && container.mouseReleased(slot.x + container.x, slot.y + container.y, 0)));
+            callback.success(String.valueOf(container.mouseClicked(slot.x + container.leftPos, slot.y + container.topPos, 0) && container.mouseReleased(slot.x + container.leftPos, slot.y + container.topPos, 0)));
             return true;
         } catch (Exception ignored) {
             callback.failure(1, "Invalid slot number");
