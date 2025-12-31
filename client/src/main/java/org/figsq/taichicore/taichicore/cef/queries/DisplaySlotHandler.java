@@ -33,7 +33,7 @@ public class DisplaySlotHandler implements QueryHandler {
             }
             val args = new DisplayArgs(TaiChiMessageRouterHandlerAdapter.parseArgs(request, "displaySlot"));
             screen.displaySlots.put(args.index, args);
-            callback.success("true");
+            callback.success("ok");
         } catch (Exception e) {
             callback.failure(1, e.getMessage());
         }

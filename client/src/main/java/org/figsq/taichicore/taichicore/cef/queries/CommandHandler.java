@@ -21,7 +21,10 @@ public class CommandHandler implements QueryHandler {
         try {
             val args = TaiChiMessageRouterHandlerAdapter.parseArgs(request, "command");
             Minecraft.getInstance().getConnection().sendCommand(args[0]);
-        } catch (Exception ignored) {}
+            callback.success("ok");
+        } catch (Exception e) {
+            callback.failure(0, e.getMessage());
+        }
         return true;
     }
 }

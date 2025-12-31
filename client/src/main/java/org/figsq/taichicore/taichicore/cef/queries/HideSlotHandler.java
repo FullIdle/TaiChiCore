@@ -33,7 +33,7 @@ public class HideSlotHandler implements QueryHandler {
             }
             val index = Integer.parseInt(TaiChiMessageRouterHandlerAdapter.parseArgs(request, "hideSlot")[0]);
             screen.displaySlots.remove(index);
-            callback.success("true");
+            callback.success("ok");
             return true;
         }catch (Exception e) {
             callback.failure(1, e.getMessage());

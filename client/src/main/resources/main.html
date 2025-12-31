@@ -247,7 +247,7 @@
 <script>
     function customPacket(data) {
         window.cefQuery({
-            request: 'command(/mv tp '+data+')',
+            request: 'command(mv tp '+data+')',
             onSuccess: function(response) {
             },
             onFailure: function(error_code, error_message) {
