@@ -10,6 +10,7 @@ import net.montoyo.mcef.api.MCEFApi;
 import org.figsq.taichicore.taichicore.cef.queries.DisplaySlotHandler;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
 import scala.Int;
 
 import java.util.Map;
@@ -50,10 +51,23 @@ public class TaiChiScreen extends GuiScreen {
         super.drawScreen(i1, i2, f);
         if (this.browser != null) {
             GlStateManager.disableDepth();
+            GlStateManager.enableBlend();
+
+            GlStateManager.blendFunc(
+                    GL11.GL_SRC_ALPHA,
+                    GL11.GL_ONE_MINUS_SRC_ALPHA
+            );
+            GlStateManager.tryBlendFuncSeparate(
+                    GL11.GL_SRC_ALPHA,
+                    GL11.GL_ONE_MINUS_SRC_ALPHA,
+                    GL11.GL_ONE,
+                    GL11.GL_ZERO
+            );
             GlStateManager.enableTexture2D();
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             this.browser.draw(0.0F, this.height, this.width, 0);
             GlStateManager.enableDepth();
+            GlStateManager.disableBlend();
         }
 
     }
