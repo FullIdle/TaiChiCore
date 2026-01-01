@@ -3,6 +3,7 @@ package org.figsq.taichicore;
 import lombok.val;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import org.figsq.taichicore.taichicore.TaiChiCore;
@@ -13,6 +14,7 @@ public class TaiChiCoreFabric extends TaiChiCore implements ModInitializer {
     @Override
     public void onInitialize() {
         this.init();
+        CommandRegistrationCallback.EVENT.register((a,b,c)->a.register(CMD));
     }
 
     @Override
