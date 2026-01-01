@@ -1,6 +1,25 @@
+plugins {
+    id 'com.gradleup.shadow'
+}
+
 architectury {
     platformSetupLoomIde()
     neoForge()
+}
+
+configurations {
+    common {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentNeoForge.extendsFrom common
+
+    shadowBundle {
+        canBeResolved = true
+        canBeConsumed = false
+    }
 }
 
 loom {
@@ -13,6 +32,7 @@ dependencies {
     neoForge "net.neoforged:neoforge:$parent.neoforge_version"
 
     common(project(path: ':client:common', configuration: 'namedElements')) { transitive = false }
+    shadowBundle project(path: ':client:common', configuration: 'transformProductionNeoForge')
 
     modImplementation 'com.cinemamod:mcef-neoforge:2.1.6-1.21.1'
 }
@@ -23,4 +43,13 @@ processResources {
     filesMatching('META-INF/neoforge.mods.toml') {
         expand version: inputs.properties.version
     }
+}
+
+shadowJar {
+    configurations = [project.configurations.shadowBundle]
+    archiveClassifier = 'dev-shadow'
+}
+
+remapJar {
+    inputFile.set shadowJar.archiveFile
 }

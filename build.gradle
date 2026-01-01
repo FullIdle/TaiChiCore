@@ -2,22 +2,12 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '2.0.20'
     id 'architectury-plugin' version '3.4-SNAPSHOT' apply(false)
     id 'dev.architectury.loom' version '1.11-SNAPSHOT' apply(false)
+    id 'com.gradleup.shadow' version '8.3.6' apply false
     id 'java'
 }
 
-def common = project(":common")
-
 allprojects {
     apply plugin: 'java'
-
-    configurations {
-        pack {
-            canBeResolved = true
-            canBeConsumed = true
-        }
-        compileClasspath.extendsFrom pack
-        runtimeClasspath.extendsFrom pack
-    }
 
     repositories {
         mavenCentral()
@@ -37,15 +27,5 @@ allprojects {
         //lombok
         compileOnly('org.projectlombok:lombok:1.18.34')
         annotationProcessor('org.projectlombok:lombok:1.18.34')
-    }
-
-    afterEvaluate {
-        jar.doFirst {
-            from(configurations.pack.collect {
-                it.isDirectory() ? it : zipTree(it)
-            })
-            exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
-            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        }
     }
 }

@@ -53,21 +53,9 @@ allprojects {
     }
 
     dependencies {
-        minecraft "net.minecraft:minecraft:1.21.1"
+        minecraft "net.minecraft:minecraft:${project.minecraft_version}"
         mappings loom.officialMojangMappings()
 
         modCompileOnly 'com.cinemamod:mcef:2.1.6-1.21.1'
-
-        pack rootProject.project(":common")
-    }
-
-    afterEvaluate {
-        jar.doFirst {
-            from(configurations.common.collect {
-                it.isDirectory() ? it : zipTree(it)
-            })
-            exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
-            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        }
     }
 }
