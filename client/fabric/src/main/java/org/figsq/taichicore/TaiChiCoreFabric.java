@@ -1,10 +1,11 @@
-package org.figsq.taichicore.taichicore;
+package org.figsq.taichicore;
 
 import lombok.val;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import org.figsq.taichicore.taichicore.TaiChiCore;
 import org.figsq.taichicore.taichicore.comm.ModCommManager;
 import org.figsq.taichicore.taichicore.comm.ReceivePacket;
 

@@ -12,7 +12,7 @@
   "environment": "client",
   "entrypoints": {
     "main": [
-      "org.figsq.taichicore.taichicore.TaiChiCoreFabric"
+      "org.figsq.taichicore.TaiChiCoreFabric"
     ],
     "client": [
     ]

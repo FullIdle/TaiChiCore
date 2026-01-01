@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'architectury-plugin'
     apply plugin: 'dev.architectury.loom'
 
-    group = 'org.figsq.taichicore.taichicore'
+    group = 'org.figsq.taichicore'
     version = '1.0-SNAPSHOT'
 
     configurations {
@@ -55,6 +55,9 @@ allprojects {
     dependencies {
         minecraft "net.minecraft:minecraft:1.21.1"
         mappings loom.officialMojangMappings()
+
+        modCompileOnly 'com.cinemamod:mcef:2.1.6-1.21.1'
+
         pack rootProject.project(":common")
     }
 
