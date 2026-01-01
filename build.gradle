@@ -22,6 +22,11 @@ allprojects {
     repositories {
         mavenCentral()
         mavenLocal()
+        //不知道为什么只能放这里
+        maven {
+            name = 'NeoForged'
+            url = 'https://maven.neoforged.net/releases'
+        }
         maven {
             allowInsecureProtocol = true
             url "http://localhost:31647/snapshots"

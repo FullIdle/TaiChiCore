@@ -1,0 +1,26 @@
+architectury {
+    platformSetupLoomIde()
+    neoForge()
+}
+
+loom {
+    neoForge {
+        accessTransformer(file('src/main/resources/META-INF/accesstransformer.cfg'))
+    }
+}
+
+dependencies {
+    neoForge "net.neoforged:neoforge:$parent.neoforge_version"
+
+    common(project(path: ':client:common', configuration: 'namedElements')) { transitive = false }
+
+    modImplementation 'com.cinemamod:mcef-neoforge:2.1.6-1.21.1'
+}
+
+processResources {
+    inputs.property 'version', project.version
+
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand version: inputs.properties.version
+    }
+}

@@ -1,0 +1,29 @@
+package org.figsq.taichicore.taichicore;
+
+import lombok.val;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import org.figsq.taichicore.taichicore.comm.ModCommManager;
+import org.figsq.taichicore.taichicore.comm.ReceivePacket;
+
+public class TaiChiCoreFabric extends TaiChiCore implements ModInitializer {
+    @Override
+    public void onInitialize() {
+        this.init();
+    }
+
+    @Override
+    public void initPlatformComm() {
+        PayloadTypeRegistry.playS2C().register(ReceivePacket.ID, ReceivePacket.CODEC);
+        ClientPlayNetworking.registerGlobalReceiver(ReceivePacket.ID, (payload, context) -> ModCommManager.INSTANCE.receive(context.responseSender(), payload.getBytes()));
+    }
+
+    @Override
+    public void sendToServer(byte[] bytes) {
+        val buf = PacketByteBufs.create();
+        buf.writeBytes(bytes);
+        ClientPlayNetworking.send(new ReceivePacket(bytes));
+    }
+}

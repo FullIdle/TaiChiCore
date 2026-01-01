@@ -1,0 +1,36 @@
+architectury {
+    platformSetupLoomIde()
+    fabric()
+}
+
+configurations {
+    common {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentFabric.extendsFrom common
+}
+
+loom {
+    def file = file('src/main/resources/taichicore.accesswidener')
+    accessWidenerPath = file
+}
+
+dependencies {
+    modImplementation "net.fabricmc:fabric-loader:$parent.fabric_loader_version"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:$parent.fabric_api_version"
+
+    common(project(path: ':client:common', configuration: 'namedElements')) { transitive = false }
+
+    modImplementation 'com.cinemamod:mcef-fabric:2.1.6-1.21.1'
+}
+
+processResources {
+    inputs.property 'version', project.version
+
+    filesMatching('fabric.mod.json') {
+        expand version: inputs.properties.version
+    }
+}

@@ -1,51 +1,70 @@
-apply plugin: 'dev.architectury.loom'
 apply plugin: 'architectury-plugin'
 
-
-group = 'org.figsq.taichicore.taichicore'
-version = '1.0-SNAPSHOT'
-
 architectury {
-    minecraft = '1.21.1'
-    platformSetupLoomIde()
-    fabric()
+    minecraft = project.minecraft_version
 }
 
-loom {
-    def file = file('src/main/resources/taichicore.accesswidener')
-    println file.getAbsolutePath()
-    accessWidenerPath = file
-}
+def aw = file('fabric/src/main/resources/taichicore.accesswidener')
 
-repositories {
-    maven {
-        url = uri('https://mcef-download.cinemamod.com/repositories/releases')
+allprojects {
+    apply plugin: 'architectury-plugin'
+    apply plugin: 'dev.architectury.loom'
+
+    group = 'org.figsq.taichicore.taichicore'
+    version = '1.0-SNAPSHOT'
+
+    configurations {
+        common {
+            canBeResolved = true
+            canBeConsumed = false
+        }
+        compileClasspath.extendsFrom common
+        runtimeClasspath.extendsFrom common
+        developmentNeoForge.extendsFrom common
     }
-    // Optional for snapshot versions
-    maven {
-        url = uri('https://mcef-download.cinemamod.com/repositories/snapshots')
+
+    base {
+        archivesName = "$rootProject.name-$project.name"
     }
-}
 
-dependencies {
-    minecraft "net.minecraft:minecraft:1.21.1"
-    mappings loom.officialMojangMappings()
+    loom {
+        silentMojangMappingsLicense()
+        accessWidenerPath = aw
+    }
 
-    modImplementation "net.fabricmc:fabric-loader:0.18.4"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:0.116.7+1.21.1"
+    java {
+        withSourcesJar()
 
-/*
-    modImplementation 'com.cinemamod:mcef:2.1.6-1.20.1'
-*/
-    modImplementation 'com.cinemamod:mcef-fabric:2.1.6-1.21.1'
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
 
-    pack rootProject.project(":common")
-}
+    tasks.withType(JavaCompile).configureEach {
+        it.options.release = 21
+    }
 
-processResources {
-    inputs.property 'version', project.version
+    repositories {
+        maven {
+            url = uri('https://mcef-download.cinemamod.com/repositories/releases')
+        }
+        maven {
+            url = uri('https://mcef-download.cinemamod.com/repositories/snapshots')
+        }
+    }
 
-    filesMatching('fabric.mod.json') {
-        expand version: project.version
+    dependencies {
+        minecraft "net.minecraft:minecraft:1.21.1"
+        mappings loom.officialMojangMappings()
+        pack rootProject.project(":common")
+    }
+
+    afterEvaluate {
+        jar.doFirst {
+            from(configurations.common.collect {
+                it.isDirectory() ? it : zipTree(it)
+            })
+            exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        }
     }
 }

@@ -1,0 +1,8 @@
+architectury {
+    common parent.enabled_platforms.split(',')
+}
+
+dependencies {
+    modImplementation "net.fabricmc:fabric-loader:$parent.fabric_loader_version"
+    modImplementation 'com.cinemamod:mcef:2.1.6-1.21.1'
+}
