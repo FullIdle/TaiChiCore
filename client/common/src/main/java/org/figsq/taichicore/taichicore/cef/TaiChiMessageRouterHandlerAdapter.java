@@ -25,6 +25,8 @@ public class TaiChiMessageRouterHandlerAdapter extends CefMessageRouterHandlerAd
         HANDLERS.add(ChatHandler.INSTANCE);
         HANDLERS.add(CommandHandler.INSTANCE);
         HANDLERS.add(CloseHandler.INSTANCE);
+        HANDLERS.add(SendHandler.INSTANCE);
+        HANDLERS.add(ItemInfoHandler.INSTANCE);
     }
 
     public static void register(CefClient client) {
