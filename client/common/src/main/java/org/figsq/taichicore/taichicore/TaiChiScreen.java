@@ -27,6 +27,7 @@ public class TaiChiScreen extends Screen {
     public ContainerScreen parent;
     public Map<Integer, DisplaySlotHandler.DisplayArgs> displaySlots = new HashMap<>();
     public String path;
+    public boolean renderCursorStack = true;
     private MCEFBrowser browser;
 
     public TaiChiScreen(@Nullable String path, @Nullable ContainerScreen parent) {
@@ -122,10 +123,13 @@ public class TaiChiScreen extends Screen {
                 val count = stack.getCount();
                 this.drawItem(guiGraphics, stack, args.x, args.y, count == 1 ? "" : count + "", args.scaleX, args.scaleY, args.depth);
             }
-            val cursorStack = handler.getCarried();
-            if (cursorStack != null && !cursorStack.isEmpty()) {
-                val count = cursorStack.getCount();
-                this.drawItem(guiGraphics, cursorStack, mouseX, mouseY, count == 1 ? "" : count + "", 1.0f, 1.0f, 1.1f);
+
+            if (this.renderCursorStack) {
+                val cursorStack = handler.getCarried();
+                if (cursorStack != null && !cursorStack.isEmpty()) {
+                    val count = cursorStack.getCount();
+                    this.drawItem(guiGraphics, cursorStack, mouseX, mouseY, count == 1 ? "" : count + "", 1.0f, 1.0f, 1.1f);
+                }
             }
         }
     }
