@@ -12,6 +12,8 @@ public class OpenUrlPacketHandler implements IPacketHandler<OpenUrlPacket, Objec
     @Override
     public void handle(OpenUrlPacket packet, Object sender) {
         val instance = Minecraft.getInstance();
+        System.out.println(instance);
+        System.out.println("接收了!");
         instance.execute(() -> instance.setScreen(new TaiChiScreen(packet.url, null)));
     }
 }

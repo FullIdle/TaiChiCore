@@ -21,7 +21,7 @@ import static me.fullidle.ficore.ficore.common.api.commands.CommandBuilder.build
 import static org.figsq.taichicore.taichicore.command.Commands.permission;
 
 public class OpenCommand {
-    public static Args<GuiConfig> CONFIG_ARGS = new Args<GuiConfig>() {
+    public static Args<GuiConfig> CONFIG_ARGS = new Args<>() {
         @Override
         public GuiConfig parse(Context context, String s) {
             return GuiConfigManager.configs.stream().filter(config -> config.identity.equals(s)).findFirst().orElse(null);
@@ -45,7 +45,7 @@ public class OpenCommand {
                         val packet = new OpenUrlPacket(config.url);
                         for (Player player : players) PluginCommManager.INSTANCE.sendTo(player, packet);
                     }))))
-            .then(builder("path").then(args("targets", MultiplayerArgs.INSTANCE).then(args("url", STRING_ARGS)
+            .then(builder("url").then(args("targets", MultiplayerArgs.INSTANCE).then(args("url", STRING_ARGS)
                     .permission(permission("open.path"))
                     .exec(context -> {
                         val players = MultiplayerArgs.INSTANCE.get(context, "targets");

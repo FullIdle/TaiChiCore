@@ -12,12 +12,15 @@ import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import org.figsq.taichicore.taichicore.cef.SchemeRenderTask;
 import org.figsq.taichicore.taichicore.cef.TaiChiLoadHandlerAdapter;
 import org.figsq.taichicore.taichicore.cef.queries.DisplaySlotHandler;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,6 +32,7 @@ public class TaiChiScreen extends Screen {
     public String path;
     public boolean renderCursorStack = true;
     private MCEFBrowser browser;
+    public final List<SchemeRenderTask> schemeTasks = new ArrayList<>();
 
     public TaiChiScreen(@Nullable String path, @Nullable ContainerScreen parent) {
         super(Component.literal("taichidemo"));
@@ -87,6 +91,11 @@ public class TaiChiScreen extends Screen {
 
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float f) {
         super.render(guiGraphics, mouseX, mouseY, f);
+
+        if (!schemeTasks.isEmpty()) {
+            for (SchemeRenderTask schemeTask : schemeTasks) schemeTask.render(guiGraphics, mouseX, mouseY, f);
+            schemeTasks.clear();
+        }
 
         if (TaiChiLoadHandlerAdapter.waitOrLoading) return;
         RenderSystem.disableDepthTest();

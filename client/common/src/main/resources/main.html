@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>横向菜单（深浅主题+边界停止+微光提示）</title>
+    <title>主菜单</title>
     <style>
         * {
             margin: 0;
@@ -265,18 +265,26 @@
 <div class="menu-container" id="menuContainer">
     <div class="horizontal-menu" id="menu">
         <!-- 9个菜单项 -->
-        <div class="menu-item" onclick="customPacket(2)">精灵世界</div>
-        <div class="menu-item" onclick="customPacket(4)">资源世界</div>
-        <div class="menu-item" onclick="customPacket(6)">地狱世界</div>
-        <div class="menu-item" onclick="customPacket(8)">末地世界</div>
-        <div class="menu-item" onclick="customPacket(22)">训练基地</div>
-        <div class="menu-item" onclick="customPacket(24)">百货商店</div>
-        <div class="menu-item" onclick="customPacket(26)">传说试炼</div>
+        <div class="menu-item" onclick="clickSlot(2)">精灵世界</div>
+        <div class="menu-item" onclick="clickSlot(4)">资源世界</div>
+        <div class="menu-item" onclick="clickSlot(6)">地狱世界</div>
+        <div class="menu-item" onclick="clickSlot(8)">末地世界</div>
+        <div class="menu-item" onclick="clickSlot(22)">训练基地</div>
+        <div class="menu-item" onclick="clickSlot(24)">百货商店</div>
+        <div class="menu-item" onclick="clickSlot(26)">传说试炼</div>
     </div>
 </div>
 
 <script>
-    function customPacket(data) {
+    window.cefQuery({
+        request: 'setProperty(renderCursorStack,false)',
+        onSuccess: function (response) {
+        },
+        onFailure: function (error_code, error_message) {
+        }
+    })
+
+    function clickSlot(data) {
         window.cefQuery({
             request: `clickSlot(${data})`,
             onSuccess: function (response) {
