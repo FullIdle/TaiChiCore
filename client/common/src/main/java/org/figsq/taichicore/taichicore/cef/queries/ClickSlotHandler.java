@@ -26,6 +26,12 @@ public class ClickSlotHandler implements QueryHandler {
                 return true;
             }
             val index = Integer.parseInt(args[0]);
+            int type;
+            try {
+                type = "left".equalsIgnoreCase(args[1]) ? 0 : "right".equalsIgnoreCase(args[1]) ? 1 : 0;
+            } catch (Exception e) {
+                type = 0;
+            }
             val client = Minecraft.getInstance();
             val screen = client.screen;
             if (!(screen instanceof TaiChiScreen)) {
@@ -43,7 +49,7 @@ public class ClickSlotHandler implements QueryHandler {
                 callback.failure(2, "Invalid slot number");
                 return true;
             }
-            callback.success(String.valueOf(container.mouseClicked(slot.x + container.leftPos, slot.y + container.topPos, 0) && container.mouseReleased(slot.x + container.leftPos, slot.y + container.topPos, 0)));
+            callback.success(String.valueOf(container.mouseClicked(slot.x + container.leftPos, slot.y + container.topPos, type) && container.mouseReleased(slot.x + container.leftPos, slot.y + container.topPos, type)));
             return true;
         } catch (Exception ignored) {
             callback.failure(1, "Invalid slot number");
