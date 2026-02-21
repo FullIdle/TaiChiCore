@@ -284,15 +284,7 @@
         }
     })
 
-    function clickSlot(data) {
-        window.cefQuery({
-            request: `clickSlot(${data},right)`,
-            onSuccess: function (response) {
-            },
-            onFailure: function (error_code, error_message) {
-            }
-        })
-    }
+
 
     // 获取DOM元素
     const menuContainer = document.getElementById('menuContainer');
