@@ -27,12 +27,12 @@ import java.util.Map;
  * @see com.cinemamod.mcef.example.ExampleScreen
  */
 public class TaiChiScreen extends Screen {
+    public final List<SchemeRenderTask> schemeTasks = new ArrayList<>();
     public ContainerScreen parent;
     public Map<Integer, DisplaySlotHandler.DisplayArgs> displaySlots = new HashMap<>();
     public String path;
     public boolean renderCursorStack = true;
-    private MCEFBrowser browser;
-    public final List<SchemeRenderTask> schemeTasks = new ArrayList<>();
+    public MCEFBrowser browser;
 
     public TaiChiScreen(@Nullable String path, @Nullable ContainerScreen parent) {
         super(Component.literal("taichidemo"));
@@ -77,8 +77,8 @@ public class TaiChiScreen extends Screen {
 
     public void onClose() {
         if (this.parent != null) this.parent.onClose();
-        TaiChiLoadHandlerAdapter.waitOrLoading = true;
         this.browser.close(true);
+        TaiChiLoadHandlerAdapter.waitWHM.remove(this.browser);
         super.onClose();
     }
 
@@ -97,7 +97,7 @@ public class TaiChiScreen extends Screen {
             schemeTasks.clear();
         }
 
-        if (TaiChiLoadHandlerAdapter.waitOrLoading) return;
+        if (!TaiChiLoadHandlerAdapter.waitWHM.containsKey(this.browser) ||  TaiChiLoadHandlerAdapter.waitWHM.get(this.browser)) return;
         RenderSystem.disableDepthTest();
 
         RenderSystem.enableBlend();

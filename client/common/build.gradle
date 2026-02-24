@@ -5,16 +5,16 @@ architectury {
 configurations {
     pack {
         canBeResolved = true
-        canBeConsumed = true
+        canBeConsumed = false
+        transitive = true
     }
     compileClasspath.extendsFrom pack
-    runtimeClasspath.extendsFrom pack
+//    runtimeClasspath.extendsFrom pack
 }
 
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:$parent.fabric_loader_version"
     pack rootProject.project(":common")
-    modCompileOnly 'com.cinemamod:mcef:2.1.6-1.21.1'
 }
 
 

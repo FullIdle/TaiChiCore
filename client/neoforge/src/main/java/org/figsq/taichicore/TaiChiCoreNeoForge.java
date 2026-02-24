@@ -1,9 +1,11 @@
 package org.figsq.taichicore;
 
 import lombok.val;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -23,6 +25,7 @@ public class TaiChiCoreNeoForge extends TaiChiCore {
         this.init();
         NeoForge.EVENT_BUS.register(this);
         bus.addListener(this::onRegisterPayload);
+        bus.addListener(this::onRegisterGuiLayer);
     }
 
     private void onRegisterPayload(RegisterPayloadHandlersEvent event) {
@@ -33,9 +36,12 @@ public class TaiChiCoreNeoForge extends TaiChiCore {
         registrar.playBidirectional(ReceivePacket.ID, ReceivePacket.CODEC, (a,c)-> ModCommManager.INSTANCE.receive(c.connection(), a.getBytes()));
     }
 
-    /**
-     * @see #onRegisterCommands(RegisterCommandsEvent)
-     */
+    private void onRegisterGuiLayer(RegisterGuiLayersEvent event) {
+        val id = ResourceLocation.tryBuild("taichicore", "hub");
+        assert id != null;
+        event.registerAboveAll(id, this::renderHUD);
+    }
+
     @Override
     public void initPlatformComm() {
     }

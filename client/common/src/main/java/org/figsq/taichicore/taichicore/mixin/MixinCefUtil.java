@@ -2,7 +2,6 @@ package org.figsq.taichicore.taichicore.mixin;
 
 import com.google.common.collect.Sets;
 import lombok.val;
-import org.cef.browser.CefBrowser;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;

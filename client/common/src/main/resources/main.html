@@ -2,400 +2,241 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>主菜单</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft RPG HUD</title>
     <style>
+        /* 全局样式重置和基础设置 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            font-family: 'Minecraft', monospace;
         }
 
-        /* 亮色主题（默认）- 使用rgba设置半透明 */
-        :root {
-            --bg-color: rgba(245, 247, 250, 0.5); /* 亮色背景+0.5透明度 */
-            --menu-bg: white;
-            --shadow-color: rgba(0, 0, 0, 0.08);
-            --glow-color: rgba(255, 255, 255, 0.8);
-            --text-color: #333;
-            /* 备用色（用于计算） */
-            --bg-solid-light: #f5f7fa;
-            --bg-solid-dark: #1a1c23;
+        /* 模拟Minecraft字体（使用像素字体替代） */
+        @font-face {
+            font-family: 'Minecraft';
+            src: url('https://cdn.jsdelivr.net/gh/IdreesInc/Minecraft-Font@master/Minecraft.ttf') format('truetype');
+            fallback: monospace;
         }
 
-        /* 暗色主题 - 使用rgba设置半透明 */
-        .dark-theme {
-            --bg-color: rgba(26, 28, 35, 0.5); /* 暗色背景+0.5透明度 */
-            --menu-bg: #2d3039;
-            --shadow-color: rgba(0, 0, 0, 0.3);
-            --glow-color: rgba(45, 48, 57, 0.9);
-            --text-color: #e0e0e0;
-        }
-
-        /* 为body添加底层纯色背景（用于半透明叠加效果） */
+        /* 关键修改：移除背景图片，设置全透明背景 */
         body {
-            min-height: 100vh;
-            background-color: var(--bg-color);
+            background: transparent !important; /* 全透明背景 */
+            height: 100vh;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        /* HUD容器 - 全屏覆盖 */
+        .hud-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            padding: 20px;
+            pointer-events: none; /* 不影响页面其他交互 */
+            background: transparent; /* 容器也设为透明 */
+        }
+
+        /* 通用进度条样式 */
+        .bar-container {
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            position: relative;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 4px;
+            border: 2px solid #000;
+            margin-bottom: 8px;
         }
 
-        /* 暗色主题时替换底层背景 */
-        .dark-theme body {
-            background-image: linear-gradient(135deg, #0f1117 0%, #1a1c23 100%);
+        .bar-label {
+            margin-right: 8px;
+            font-size: 16px;
+            text-shadow: 2px 2px 0 #000;
+            min-width: 60px;
         }
 
-        /* 主题切换按钮按钮 */
-        .theme-toggle {
+        .bar-fill-area {
+            width: 200px;
+            height: 20px;
+            background: #333;
+            border: 2px solid #666;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        /* 血量条样式 */
+        .health-bar .bar-fill {
+            background: linear-gradient(90deg, #ff4444, #ff0000);
+            width: 85%; /* 8.5颗心 */
+        }
+
+        /* 饱食度条样式 */
+        .hunger-bar .bar-fill {
+            background: linear-gradient(90deg, #f1c40f, #f39c12);
+            width: 60%; /* 6格饱食度 */
+        }
+
+        /* 经验条样式 */
+        .xp-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            max-width: 800px;
+        }
+
+        .xp-bar .bar-fill-area {
+            width: 100%;
+        }
+
+        .xp-bar .bar-fill {
+            background: linear-gradient(90deg, #8e44ad, #9b59b6);
+            width: 45%; /* 45%经验 */
+        }
+
+        .xp-level {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        /* RPG布局位置 */
+        .top-left {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .top-right {
             position: absolute;
             top: 20px;
             right: 20px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: none;
-            background-color: var(--menu-bg);
-            color: var(--text-color);
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 10px var(--shadow-color);
-            z-index: 999;
-            transition: all 0.3s ease;
         }
 
-        .theme-toggle:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px var(--shadow-color);
+        /* 玩家信息 */
+        .player-info {
+            font-size: 20px;
+            text-shadow: 2px 2px 0 #000;
+            margin-bottom: 10px;
+            color: #ffff00;
         }
 
-        /* 菜单容器 - 仅显示3个元素的宽度，添加首尾微光容器 */
-        .menu-container {
-            width: 100%;
-            max-width: 900px; /* 3个元素的总宽度（每个300px） */
-            overflow: hidden;
-            position: relative;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px var(--shadow-color);
-        }
-
-        /* 首尾微光提示效果 */
-        .menu-container::before,
-        .menu-container::after {
-            content: '';
+        /* 快捷栏（额外增强） */
+        .hotbar {
             position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 40px;
-            z-index: 10;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        /* 左侧微光（第一个元素时显示） */
-        .menu-container::before {
-            left: 0;
-            background: linear-gradient(to right, var(--glow-color), transparent);
-        }
-
-        /* 右侧微光（最后一个元素时显示） */
-        .menu-container::after {
-            right: 0;
-            background: linear-gradient(to left, var(--glow-color), transparent);
-        }
-
-        /* 显示左侧微光 */
-        .menu-container.show-left-glow::before {
-            opacity: 1;
-        }
-
-        /* 显示右侧微光 */
-        .menu-container.show-right-glow::after {
-            opacity: 1;
-        }
-
-        /* 横向菜单列表 - 包含所有9个元素 */
-        .horizontal-menu {
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            width: fit-content; /* 宽度自适应所有子元素 */
-            transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-            background-color: var(--menu-bg);
-            padding: 10px 0;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px;
+            border: 2px solid #000;
         }
 
-        /* 菜单项基础样式 - 单个元素固定宽度 */
-        .menu-item {
-            width: 300px; /* 单个元素宽度，3个就是900px */
-            height: 400px;
-            flex-shrink: 0; /* 禁止收缩，保证宽度固定 */
+        .hotbar-slot {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #666;
+            background: rgba(100, 100, 100, 0.3);
+            margin: 0 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
-            font-weight: 600;
-            color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            margin: 0 10px;
-            transition: all 0.3s ease; /* 放大缩小过渡 */
-            position: relative;
-            z-index: 1;
-            cursor: pointer; /* 鼠标悬浮显示手型 */
         }
 
-        /* 鼠标悬浮放大效果 */
-        .menu-item:hover {
-            transform: scale(1.05); /* 放大5% */
-            z-index: 2;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        .hotbar-slot.active {
+            border-color: #ffff00;
         }
 
-        /* 9个元素的渐变背景（不同配色） */
-        .menu-item:nth-child(1) {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        /* 悬停提示 */
+        .bar-container:hover {
+            background: rgba(0, 0, 0, 0.7);
         }
 
-        .menu-item:nth-child(2) {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .menu-item:nth-child(3) {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-
-        .menu-item:nth-child(4) {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        }
-
-        .menu-item:nth-child(5) {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        }
-
-        .menu-item:nth-child(6) {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
-        }
-
-        .menu-item:nth-child(7) {
-            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
-        }
-
-        .menu-item:nth-child(8) {
-            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
-        }
-
-        .menu-item:nth-child(9) {
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-        }
-
-        /* 响应式调整 - 移动端适配 */
-        @media (max-width: 768px) {
-            .menu-container {
-                max-width: 600px; /* 移动端显示3个元素，每个200px */
-            }
-
-            .menu-item {
-                width: 200px; /* 移动端单个元素宽度 */
-                height: 300px;
-                font-size: 1.5rem;
-                margin: 0 8px;
-            }
-
-            /* 移动端微光宽度减小 */
-            .menu-container::before,
-            .menu-container::after {
-                width: 30px;
-            }
-
-            /* 移动端主题按钮缩小 */
-            .theme-toggle {
-                width: 40px;
-                height: 40px;
-                font-size: 1rem;
-                top: 15px;
-                right: 15px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .menu-container {
-                max-width: 300px; /* 小屏显示3个元素，每个100px */
-            }
-
-            .menu-item {
-                width: 100px; /* 小屏单个元素宽度 */
-                height: 200px;
-                font-size: 1rem;
-                margin: 0 5px;
-            }
-
-            .menu-item:hover {
-                transform: scale(1.03); /* 小屏放大比例减小 */
-            }
-
-            /* 小屏微光宽度进一步减小 */
-            .menu-container::before,
-            .menu-container::after {
-                width: 20px;
-            }
-
-            /* 小屏主题按钮进一步缩小 */
-            .theme-toggle {
-                width: 35px;
-                height: 35px;
-                font-size: 0.9rem;
-                top: 10px;
-                right: 10px;
-            }
+        .bar-container:hover::after {
+            content: attr(data-value);
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            padding: 2px 8px;
+            border: 1px solid #666;
+            font-size: 14px;
+            white-space: nowrap;
         }
     </style>
 </head>
 <body>
-<!-- 主题切换按钮 -->
-<button class="theme-toggle" id="themeToggle">🌞</button>
+<div class="hud-container">
+    <!-- 左上角 - 血量和玩家信息 (RPG经典位置) -->
+    <div class="top-left">
+        <div class="player-info">Steve Lv.25</div>
+        <div class="bar-container health-bar" data-value="17/20 生命值">
+            <div class="bar-label">生命</div>
+            <div class="bar-fill-area">
+                <div class="bar-fill"></div>
+            </div>
+        </div>
+    </div>
 
-<!-- 横向菜单容器 -->
-<div class="menu-container" id="menuContainer">
-    <div class="horizontal-menu" id="menu">
-        <!-- 9个菜单项 -->
-        <div class="menu-item" onclick="clickSlot(0)" oncontextmenu="">精灵世界</div>
-        <div class="menu-item" onclick="clickSlot(4)">资源世界</div>
-        <div class="menu-item" onclick="clickSlot(6)">地狱世界</div>
-        <div class="menu-item" onclick="clickSlot(8)">末地世界</div>
-        <div class="menu-item" onclick="clickSlot(22)">训练基地</div>
-        <div class="menu-item" onclick="clickSlot(24)">百货商店</div>
-        <div class="menu-item" onclick="clickSlot(26)">传说试炼</div>
+    <!-- 右上角 - 饱食度 (RPG经典位置) -->
+    <div class="top-right">
+        <div class="bar-container hunger-bar" data-value="12/20 饱食度">
+            <div class="bar-label">饱食</div>
+            <div class="bar-fill-area">
+                <div class="bar-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 - 经验条 (RPG经典位置) -->
+    <div class="bar-container xp-bar" data-value="45% 经验值">
+        <div class="bar-label">经验</div>
+        <div class="bar-fill-area">
+            <div class="bar-fill"></div>
+        </div>
+        <div class="xp-level">Lv.25</div>
+    </div>
+
+    <!-- 底部快捷栏 (增强体验) -->
+    <div class="hotbar">
+        <div class="hotbar-slot">🪓</div>
+        <div class="hotbar-slot active">⚔️</div>
+        <div class="hotbar-slot">🏹</div>
+        <div class="hotbar-slot">🍞</div>
+        <div class="hotbar-slot">🧪</div>
+        <div class="hotbar-slot">⛏️</div>
+        <div class="hotbar-slot">🛡️</div>
+        <div class="hotbar-slot">🧱</div>
+        <div class="hotbar-slot">🔥</div>
     </div>
 </div>
 
 <script>
-    window.cefQuery({
-        request: 'setProperty(renderCursorStack,false)',
-        onSuccess: function (response) {
-        },
-        onFailure: function (error_code, error_message) {
-        }
-    })
+    // 简单的交互效果：随机修改数值演示
+    setInterval(() => {
+        // 随机修改血量值 (10-20之间)
+        const healthPercent = Math.floor(Math.random() * 90) + 10;
+        document.querySelector('.health-bar .bar-fill').style.width = `${healthPercent}%`;
+        document.querySelector('.health-bar').setAttribute('data-value', `${Math.floor(healthPercent/5)}${healthPercent%5 >= 2.5 ? '.5' : ''}/20 生命值`);
 
+        // 随机修改饱食度值 (5-20之间)
+        const hungerPercent = Math.floor(Math.random() * 75) + 25;
+        document.querySelector('.hunger-bar .bar-fill').style.width = `${hungerPercent}%`;
+        document.querySelector('.hunger-bar').setAttribute('data-value', `${Math.floor(hungerPercent/5)}${hungerPercent%5 >= 2.5 ? '.5' : ''}/20 饱食度`);
 
+    }, 3000);
 
-    // 获取DOM元素
-    const menuContainer = document.getElementById('menuContainer');
-    const menu = document.getElementById('menu');
-    const menuItems = Array.from(menu.children);
-    const themeToggle = document.getElementById('themeToggle');
-    const totalItems = menuItems.length; // 9个元素
-    const visibleCount = 3; // 每次显示3个元素
-    const maxScrollIndex = totalItems - visibleCount; // 最大滚动索引（6）
-
-    // 当前滚动索引（0-6）
-    let currentScrollIndex = 0;
-    // 单个元素宽度（包含margin）
-    let itemWidth = menuItems[0].offsetWidth + 20; // +20是左右margin的总和
-    // 主题状态（默认亮色）
-    let isDarkTheme = false;
-
-    // 更新菜单位置和微光提示
-    function updateMenu() {
-        // 计算滚动距离
-        const scrollDistance = currentScrollIndex * itemWidth;
-        menu.style.transform = `translateX(-${scrollDistance}px)`;
-
-        // 控制微光显示/隐藏
-        // 第一个元素（索引0）：显示左侧微光，隐藏右侧微光
-        if (currentScrollIndex === 0) {
-            menuContainer.classList.add('show-left-glow');
-            menuContainer.classList.remove('show-right-glow');
-        }
-        // 最后一个元素（索引maxScrollIndex）：显示右侧微光，隐藏左侧微光
-        else if (currentScrollIndex === maxScrollIndex) {
-            menuContainer.classList.remove('show-left-glow');
-            menuContainer.classList.add('show-right-glow');
-        }
-        // 中间元素：隐藏所有微光
-        else {
-            menuContainer.classList.remove('show-left-glow');
-            menuContainer.classList.remove('show-right-glow');
-        }
-    }
-
-    // 切换深浅主题
-    function toggleTheme() {
-        isDarkTheme = !isDarkTheme;
-        document.body.classList.toggle('dark-theme', isDarkTheme);
-        // 更新按钮图标
-        themeToggle.textContent = isDarkTheme ? '🌙' : '🌞';
-        // 保存主题偏好到本地存储
-        localStorage.setItem('preferredTheme', isDarkTheme ? 'dark' : 'light');
-    }
-
-    // 从本地存储恢复主题偏好
-    function initTheme() {
-        const savedTheme = localStorage.getItem('preferredTheme');
-        if (savedTheme === 'dark') {
-            isDarkTheme = true;
-            document.body.classList.add('dark-theme');
-            themeToggle.textContent = '🌙';
-        } else {
-            isDarkTheme = false;
-            document.body.classList.remove('dark-theme');
-            themeToggle.textContent = '🌞';
-        }
-    }
-
-    // 键盘事件监听（A/D键控制）
-    document.addEventListener('keydown', (e) => {
-        // 按A键：向右滚动1个元素（索引减小）- 仅在不是第一个元素时生效
-        if ((e.key === 'a' || e.key === 'A') && currentScrollIndex > 0) {
-            currentScrollIndex--;
-            updateMenu();
-        }
-
-        // 按D键：向左滚动1个元素（索引增大）- 仅在不是最后一个元素时生效
-        if ((e.key === 'd' || e.key === 'D') && currentScrollIndex < maxScrollIndex) {
-            currentScrollIndex++;
-            updateMenu();
-        }
-    });
-
-    // 鼠标滚轮横向滚动监听
-    menuContainer.addEventListener('wheel', (e) => {
-        // 阻止默认滚轮行为（避免页面上下滚动）
-        e.preventDefault();
-
-        // 滚轮向下/向右 → 向左滚动（仅在不是最后一个元素时）
-        if ((e.deltaY > 0 || e.deltaX > 0) && currentScrollIndex < maxScrollIndex) {
-            currentScrollIndex++;
-            updateMenu();
-        }
-        // 滚轮向上/向左 → 向右滚动（仅在不是第一个元素时）
-        else if ((e.deltaY < 0 || e.deltaX < 0) && currentScrollIndex > 0) {
-            currentScrollIndex--;
-            updateMenu();
-        }
-    }, {passive: false}); // passive: false 允许阻止默认行为
-
-    // 窗口大小变化时重新计算元素宽度并调整位置
-    window.addEventListener('resize', () => {
-        // 重新获取单个元素宽度（包含margin）
-        itemWidth = menuItems[0].offsetWidth + (window.innerWidth > 768 ? 20 : (window.innerWidth > 480 ? 16 : 10));
-        // 重新计算滚动位置
-        updateMenu();
-    });
-
-    // 绑定主题切换事件
-    themeToggle.addEventListener('click', toggleTheme);
-
-    // 初始化
-    initTheme();
-    updateMenu();
+    Java.type('java.lang.System').out.println('测试测试')
 </script>
 </body>
 </html>

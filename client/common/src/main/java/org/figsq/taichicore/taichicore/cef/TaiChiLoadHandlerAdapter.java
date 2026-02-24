@@ -4,13 +4,14 @@ import org.cef.CefClient;
 import org.cef.browser.CefBrowser;
 import org.cef.handler.CefLoadHandlerAdapter;
 
+import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
 
 public class TaiChiLoadHandlerAdapter extends CefLoadHandlerAdapter {
     public static final TaiChiLoadHandlerAdapter INSTANCE = new TaiChiLoadHandlerAdapter();
     public static final CompletableFuture<Void> delaySetting = CompletableFuture.runAsync(() -> {
     });
-    public static boolean waitOrLoading = true;
+    public static WeakHashMap<CefBrowser, Boolean> waitWHM = new WeakHashMap<>();
 
     public static void register(CefClient client) {
         client.removeLoadHandler();
@@ -26,7 +27,7 @@ public class TaiChiLoadHandlerAdapter extends CefLoadHandlerAdapter {
         delaySetting.thenRunAsync(() -> {
             try {
                 Thread.sleep(50);
-                waitOrLoading = isLoading;
+                waitWHM.put(browser, isLoading);
             } catch (InterruptedException ignored) {
             }
         });

@@ -17,13 +17,14 @@ import org.figsq.taichicore.taichicore.TaiChiScreen;
 
 /**
  * 最终修复版：解决视口与读取坐标不匹配导致的透明图片问题
+ *
  * @see ModScheme
  */
 @Getter
 public class TaiChiScheme implements CefResourceHandler {
+    private final String url;
     private String contentType;
     private byte[] bytes;
-    private final String url;
     private int readOffset = 0;
 
     public TaiChiScheme(String url) {

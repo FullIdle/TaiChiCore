@@ -39,19 +39,8 @@ allprojects {
         it.options.release = 21
     }
 
-    repositories {
-        maven {
-            url = uri('https://mcef-download.cinemamod.com/repositories/releases')
-        }
-        maven {
-            url = uri('https://mcef-download.cinemamod.com/repositories/snapshots')
-        }
-    }
-
     dependencies {
         minecraft "net.minecraft:minecraft:${project.minecraft_version}"
         mappings loom.officialMojangMappings()
-
-        modCompileOnly 'com.cinemamod:mcef:2.1.6-1.21.1'
     }
 }

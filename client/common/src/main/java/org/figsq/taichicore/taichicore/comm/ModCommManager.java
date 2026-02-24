@@ -6,9 +6,11 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import org.figsq.taichicore.taichicore.TaiChiCore;
 import org.figsq.taichicore.taichicore.comm.handler.OpenUrlPacketHandler;
+import org.figsq.taichicore.taichicore.comm.handler.SetHUDPacketHandler;
 import org.figsq.taichicore.taichicore.comm.handler.UpdateConfigPacketHandler;
 import org.figsq.taichicore.taichicore.common.comm.CommManager;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.OpenUrlPacket;
+import org.figsq.taichicore.taichicore.common.comm.packets.client.SetHUDPacket;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.UpdateConfigPacket;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,6 +38,7 @@ public class ModCommManager extends CommManager<Object> {
     public void registerHandler() {
         registerHandler(UpdateConfigPacket.class, UpdateConfigPacketHandler.INSTANCE);
         registerHandler(OpenUrlPacket.class, OpenUrlPacketHandler.INSTANCE);
+        registerHandler(SetHUDPacket.class, SetHUDPacketHandler.INSTANCE);
     }
 
     @Override

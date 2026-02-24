@@ -32,4 +32,12 @@ public abstract class MixinMinecraftClient {
             if (guiConfig.match(containerScreen.getTitle().getString()))
                 setScreen(new TaiChiScreen(guiConfig.url, containerScreen));
     }
+
+    @Inject(
+            method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V",
+            at = @At(value = "HEAD")
+    )
+    public void disconnect(Screen screen, boolean keepLoaded, CallbackInfo ci) {
+        TaiChiCore.closeHudScreen();
+    }
 }

@@ -33,8 +33,6 @@ dependencies {
 
     common(project(path: ':client:common', configuration: 'namedElements')) { transitive = false }
     shadowBundle project(path: ':client:common', configuration: 'transformProductionNeoForge')
-
-    runtimeOnly 'com.cinemamod:mcef-neoforge:2.1.6-1.21.1'
 }
 
 processResources {
