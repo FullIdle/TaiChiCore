@@ -7,9 +7,6 @@
     "MixinMinecraftClient"
   ],
   "mixins": [
-    "MixinCefUtil",
-    "MixinMCEF",
-    "MixinModScheme"
   ],
   "injectors": {
     "defaultRequire": 1

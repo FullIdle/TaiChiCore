@@ -4,18 +4,13 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import lombok.Getter;
 import lombok.val;
-import me.friwi.jcefmaven.CefAppBuilder;
-import me.friwi.jcefmaven.CefInitializationException;
-import me.friwi.jcefmaven.UnsupportedPlatformException;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.network.chat.Component;
 import org.figsq.taichicore.taichicore.comm.ModCommManager;
 import org.figsq.taichicore.taichicore.common.comm.config.GuiConfig;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,13 +35,7 @@ public abstract class TaiChiCore {
                         return 1;
                     })))
             .then(literal("test").executes(context -> {
-                val cefAppBuilder = new CefAppBuilder();
-                try {
-                    cefAppBuilder.build();
-                    Minecraft.getInstance().player.sendSystemMessage(Component.literal("test"));
-                } catch (IOException | UnsupportedPlatformException | InterruptedException | CefInitializationException e) {
-                    throw new RuntimeException(e);
-                }
+
                 return 1;
             }));
     public static List<GuiConfig> guiConfigs = new ArrayList<>();

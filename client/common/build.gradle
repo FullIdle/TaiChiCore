@@ -1,5 +1,32 @@
+plugins {
+    id 'idea'
+}
+
 architectury {
     common parent.enabled_platforms.split(',')
+}
+
+sourceSets {
+    jcef {
+        java {
+            srcDirs += file('./java-cef/java')
+            exclude "**/tests/**"
+        }
+    }
+
+    main {
+        compileClasspath += jcef.output
+        runtimeClasspath += jcef.output
+    }
+}
+
+processResources.dependsOn(processJcefResources)
+
+idea {
+    module {
+        excludeDirs += file(".java-cef/java/tests")
+        inheritOutputDirs true
+    }
 }
 
 configurations {
@@ -19,6 +46,11 @@ dependencies {
 
 
 jar {
+    from sourceSets.jcef.output.classesDirs
+    from sourceSets.jcef.output.resourcesDir
+
+    println sourceSets.jcef.output.classesDirs.asPath
+
     from(configurations.pack.collect {
         it.isDirectory() ? it : zipTree(it)
     })

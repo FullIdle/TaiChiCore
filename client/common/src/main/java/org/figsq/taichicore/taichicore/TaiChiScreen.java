@@ -1,7 +1,5 @@
 package org.figsq.taichicore.taichicore;
 
-import com.cinemamod.mcef.MCEF;
-import com.cinemamod.mcef.MCEFBrowser;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import lombok.val;
@@ -23,9 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @see com.cinemamod.mcef.example.ExampleScreen
- */
+
 public class TaiChiScreen extends Screen {
     public final List<SchemeRenderTask> schemeTasks = new ArrayList<>();
     public ContainerScreen parent;
