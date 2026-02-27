@@ -11,7 +11,9 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import org.figsq.taichicore.taichicore.cef.SchemeRenderTask;
+import org.figsq.taichicore.taichicore.cef.TaiChiBrowser;
 import org.figsq.taichicore.taichicore.cef.TaiChiLoadHandlerAdapter;
+import org.figsq.taichicore.taichicore.cef.misc.CefUtil;
 import org.figsq.taichicore.taichicore.cef.queries.DisplaySlotHandler;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
@@ -28,7 +30,7 @@ public class TaiChiScreen extends Screen {
     public Map<Integer, DisplaySlotHandler.DisplayArgs> displaySlots = new HashMap<>();
     public String path;
     public boolean renderCursorStack = true;
-    public MCEFBrowser browser;
+    public TaiChiBrowser browser;
 
     public TaiChiScreen(@Nullable String path, @Nullable ContainerScreen parent) {
         super(Component.literal("taichidemo"));
@@ -40,7 +42,7 @@ public class TaiChiScreen extends Screen {
     protected void init() {
         super.init();
         if (this.browser == null) {
-            this.browser = MCEF.createBrowser(path, true);
+            this.browser = CefUtil.createBrowser(path, true);
             this.resizeBrowser();
         }
     }

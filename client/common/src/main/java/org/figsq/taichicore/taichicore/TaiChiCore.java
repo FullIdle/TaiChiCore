@@ -10,6 +10,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.commands.CommandSourceStack;
 import org.figsq.taichicore.taichicore.comm.ModCommManager;
 import org.figsq.taichicore.taichicore.common.comm.config.GuiConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,9 @@ public abstract class TaiChiCore {
     public static TaiChiCore INSTANCE;
     @Getter
     private static TaiChiScreen hudScreen;
+    public static final String MOD_ID = "taichicore";
+    public static final String MOD_NAME = "TaiChiCore";
+    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 /*
     public static final NashornScriptEngine SCRIPT_ENGINE = (NashornScriptEngine) new NashornScriptEngineFactory().getScriptEngine(TaiChiCore.class.getClassLoader());
 */
