@@ -49,8 +49,6 @@ jar {
     from sourceSets.jcef.output.classesDirs
     from sourceSets.jcef.output.resourcesDir
 
-    println sourceSets.jcef.output.classesDirs.asPath
-
     from(configurations.pack.collect {
         it.isDirectory() ? it : zipTree(it)
     })

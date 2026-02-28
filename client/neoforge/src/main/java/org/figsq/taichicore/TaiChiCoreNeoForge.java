@@ -19,13 +19,11 @@ import static org.figsq.taichicore.TaiChiCoreNeoForge.MOD_ID;
 
 @Mod(MOD_ID)
 public class TaiChiCoreNeoForge extends TaiChiCore {
-    public static final String MOD_ID = "taichicore";
-
     public TaiChiCoreNeoForge(IEventBus bus) {
         this.init();
         NeoForge.EVENT_BUS.register(this);
         bus.addListener(this::onRegisterPayload);
-        bus.addListener(this::onRegisterGuiLayer);
+//        bus.addListener(this::onRegisterGuiLayer);
     }
 
     private void onRegisterPayload(RegisterPayloadHandlersEvent event) {
@@ -36,11 +34,11 @@ public class TaiChiCoreNeoForge extends TaiChiCore {
         registrar.playBidirectional(ReceivePacket.ID, ReceivePacket.CODEC, (a,c)-> ModCommManager.INSTANCE.receive(c.connection(), a.getBytes()));
     }
 
-    private void onRegisterGuiLayer(RegisterGuiLayersEvent event) {
-        val id = ResourceLocation.tryBuild("taichicore", "hub");
-        assert id != null;
-        event.registerAboveAll(id, this::renderHUD);
-    }
+//    private void onRegisterGuiLayer(RegisterGuiLayersEvent event) {
+//        val id = ResourceLocation.tryBuild("taichicore", "hub");
+//        assert id != null;
+//        event.registerAboveAll(id, this::renderHUD);
+//    }
 
     @Override
     public void initPlatformComm() {

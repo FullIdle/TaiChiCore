@@ -1,6 +1,5 @@
 package org.figsq.taichicore.taichicore.cef;
 
-
 import com.mojang.blaze3d.systems.RenderSystem;
 import lombok.Getter;
 
@@ -8,15 +7,12 @@ import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL12.*;
 
-/**
- * 来自MCEF: <a href="https://github.com/CinemaMod/mcef/">...</a>
- */
-public class TaiChiRenderer {
+public class TaiChiCefRenderer {
     @Getter
     private final boolean transparent;
     private final int[] textureID = new int[1];
 
-    public TaiChiRenderer(boolean transparent) {
+    protected TaiChiCefRenderer(boolean transparent) {
         this.transparent = transparent;
     }
 
@@ -39,7 +35,7 @@ public class TaiChiRenderer {
         }
     }
 
-    public void onPaint(ByteBuffer buffer, int width, int height) {
+    protected void onPaint(ByteBuffer buffer, int width, int height) {
         if (textureID[0] == 0) return;
         if (transparent) RenderSystem.enableBlend();
         RenderSystem.bindTexture(textureID[0]);
@@ -50,7 +46,7 @@ public class TaiChiRenderer {
                 GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
     }
 
-    public void onPaint(ByteBuffer buffer, int x, int y, int width, int height) {
+    protected void onPaint(ByteBuffer buffer, int x, int y, int width, int height) {
         glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_BGRA,
                 GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
     }

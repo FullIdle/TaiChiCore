@@ -1,7 +1,7 @@
 package org.figsq.taichicore.taichicore.mixin;
 
 import net.minecraft.client.resources.ClientPackSource;
-import org.figsq.taichicore.taichicore.cef.misc.CefUtil;
+import org.figsq.taichicore.taichicore.cef.TaiChiCefUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -14,6 +14,6 @@ public class MixinClientPackSource {
             at = @At("HEAD")
     )
     private static void cefInit(CallbackInfo ci) {
-        if (!CefUtil.init()) throw new RuntimeException("CEF initialization failed");
+        if (!TaiChiCefUtil.init()) throw new RuntimeException("CEF initialization failed");
     }
 }
