@@ -2,6 +2,7 @@ package org.figsq.taichicore.taichicore;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -9,6 +10,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import org.figsq.taichicore.taichicore.cef.TaiChiCefBrowser;
 import org.figsq.taichicore.taichicore.cef.TaiChiCefUtil;
+import org.figsq.taichicore.taichicore.glfwtoawt.GlfwToAwtKey;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.event.InputEvent;
@@ -16,6 +18,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 public class TaiChiScreen extends Screen {
+    @Getter
     private TaiChiCefBrowser browser;
     private final String url;
     private int btnMask = 0;
@@ -207,7 +210,7 @@ public class TaiChiScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        browser.sendKeyEvent(GlfwToAwtKeyMapper.createKeyEvent(
+        browser.sendKeyEvent(GlfwToAwtKey.createKeyEvent(
                 TaiChiCefUtil.AWT_TAICHI_COMPONENT,
                 keyCode,
                 modifiers,
@@ -220,7 +223,7 @@ public class TaiChiScreen extends Screen {
 
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        browser.sendKeyEvent(GlfwToAwtKeyMapper.createKeyEvent(
+        browser.sendKeyEvent(GlfwToAwtKey.createKeyEvent(
                 TaiChiCefUtil.AWT_TAICHI_COMPONENT,
                 keyCode,
                 modifiers,
@@ -234,7 +237,7 @@ public class TaiChiScreen extends Screen {
     @Override
     public boolean charTyped(char codePoint, int modifiers) {
         if (codePoint == (char) 0) return false;
-        browser.sendKeyEvent(GlfwToAwtKeyMapper.createCharTypedEvent(
+        browser.sendKeyEvent(GlfwToAwtKey.createCharTypedEvent(
                 TaiChiCefUtil.AWT_TAICHI_COMPONENT,
                 codePoint
         ));

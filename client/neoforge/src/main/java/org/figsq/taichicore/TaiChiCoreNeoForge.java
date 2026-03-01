@@ -23,7 +23,7 @@ public class TaiChiCoreNeoForge extends TaiChiCore {
         this.init();
         NeoForge.EVENT_BUS.register(this);
         bus.addListener(this::onRegisterPayload);
-//        bus.addListener(this::onRegisterGuiLayer);
+        bus.addListener(this::onRegisterGuiLayer);
     }
 
     private void onRegisterPayload(RegisterPayloadHandlersEvent event) {
@@ -34,11 +34,11 @@ public class TaiChiCoreNeoForge extends TaiChiCore {
         registrar.playBidirectional(ReceivePacket.ID, ReceivePacket.CODEC, (a,c)-> ModCommManager.INSTANCE.receive(c.connection(), a.getBytes()));
     }
 
-//    private void onRegisterGuiLayer(RegisterGuiLayersEvent event) {
-//        val id = ResourceLocation.tryBuild("taichicore", "hub");
-//        assert id != null;
-//        event.registerAboveAll(id, this::renderHUD);
-//    }
+    private void onRegisterGuiLayer(RegisterGuiLayersEvent event) {
+        val id = ResourceLocation.tryBuild("taichicore", "hub");
+        assert id != null;
+        event.registerAboveAll(id, this::renderHUD);
+    }
 
     @Override
     public void initPlatformComm() {

@@ -1,4 +1,4 @@
-package org.figsq.taichicore.taichicore;
+package org.figsq.taichicore.taichicore.glfwtoawt;
 
 import lombok.val;
 import org.cef.OS;
@@ -11,7 +11,7 @@ import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GlfwToAwtKeyMapper {
+public class GlfwToAwtKey {
     private static final Map<Integer, Integer> GLFW_TO_AWT = new HashMap<>();
     private static final Map<Integer, Integer> GLFW_TO_LOCATION = new HashMap<>();
 

@@ -3,6 +3,7 @@ package org.figsq.taichicore.taichicore.cef;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import lombok.Getter;
+import lombok.val;
 import net.minecraft.client.Minecraft;
 import org.cef.CefBrowserSettings;
 import org.cef.CefClient;
@@ -10,6 +11,7 @@ import org.cef.browser.CefBrowser;
 import org.cef.browser.CefBrowserOsr;
 import org.cef.browser.CefRequestContext;
 import org.cef.callback.CefDragData;
+import org.figsq.taichicore.taichicore.glfwtoawt.GlfwToAwtCursor;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
 
@@ -222,5 +224,13 @@ public class TaiChiCefBrowser extends CefBrowserOsr {
             isDragging = false;
             currentDragData = null;
         }
+    }
+
+    //光标变化
+    @Override
+    public boolean onCursorChange(CefBrowser browser, int cursorType) {
+        val window = Minecraft.getInstance().getWindow().getWindow();
+        GLFW.glfwSetCursor(window, GlfwToAwtCursor.glfwCursor(cursorType));
+        return true;
     }
 }
