@@ -9,6 +9,7 @@ import org.cef.CefClient;
 import org.cef.browser.CefBrowser;
 import org.cef.browser.CefBrowserOsr;
 import org.cef.browser.CefRequestContext;
+import org.cef.callback.CefDragData;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
 
@@ -18,7 +19,7 @@ import java.nio.ByteBuffer;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * 绝大部分来源于 MCEF
+ * 渲染部分来源于 MCEF
  */
 @Getter
 public class TaiChiCefBrowser extends CefBrowserOsr {
@@ -31,6 +32,12 @@ public class TaiChiCefBrowser extends CefBrowserOsr {
 
     private int lastWidth;
     private int lastHeight;
+
+    //拖拽
+    private CefDragData currentDragData;
+    private int currentDragMask;
+    private int currentDragOperation;
+    private boolean isDragging = false;
 
     public TaiChiCefBrowser(CefClient client,
                             String url,
@@ -135,6 +142,7 @@ public class TaiChiCefBrowser extends CefBrowserOsr {
 
     @Override
     public void close(boolean force) {
+        this.cancelDrag();
         Minecraft.getInstance().execute(renderer::cleanup);
         super.close(force);
     }
@@ -173,5 +181,46 @@ public class TaiChiCefBrowser extends CefBrowserOsr {
         GLFW.glfwGetWindowSize(window, winWidth, winHeight);
 
         return Math.max(1, Math.min(fbWidth[0] / winWidth[0], fbHeight[0] / winHeight[0]));
+    }
+
+    //拖拽逻辑
+    @Override
+    public boolean startDragging(CefBrowser browser, CefDragData dragData, int mask, int x, int y) {
+        currentDragData = dragData;
+        currentDragMask = mask;
+        isDragging = true;
+        dragTargetDragEnter(dragData, new Point(x, y), 0, mask);
+        return true;
+    }
+
+    @Override
+    public void updateDragCursor(CefBrowser browser, int operation) {
+        super.updateDragCursor(browser, operation);
+        currentDragOperation = operation;
+    }
+
+    public void onDragOver(int x, int y, int modifiers) {
+        if (isDragging) dragTargetDragOver(new Point(x, y), modifiers, currentDragMask);
+    }
+
+    public void onDragDrop(int x, int y, int modifiers) {
+        if (isDragging) {
+            dragTargetDragOver(new Point(x, y), modifiers, currentDragMask);
+            dragTargetDrop(new Point(x, y), modifiers);
+            dragSourceEndedAt(new Point(x, y), currentDragOperation);
+            dragSourceSystemDragEnded();
+            isDragging = false;
+            currentDragData = null;
+        }
+    }
+
+    public void cancelDrag() {
+        if (isDragging) {
+            dragTargetDragLeave();
+            dragSourceEndedAt(new Point(0, 0), 0);
+            dragSourceSystemDragEnded();
+            isDragging = false;
+            currentDragData = null;
+        }
     }
 }

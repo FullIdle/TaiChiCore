@@ -178,6 +178,20 @@ public class TaiChiScreen extends Screen {
         };
     }
 
+    private void setScanCode(KeyEvent event, long scanCode) {
+        try {
+            java.lang.reflect.Field unsafeField = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
+            unsafeField.setAccessible(true);
+            sun.misc.Unsafe unsafe = (sun.misc.Unsafe) unsafeField.get(null);
+
+            java.lang.reflect.Field scancodeField = KeyEvent.class.getDeclaredField("scancode");
+            long offset = unsafe.objectFieldOffset(scancodeField);
+            unsafe.putLong(event, offset, scanCode);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         super.mouseClicked(mouseX, mouseY, button);
@@ -196,6 +210,7 @@ public class TaiChiScreen extends Screen {
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         super.mouseReleased(mouseX, mouseY, button);
+        browser.onDragDrop(mouseX(mouseX), mouseY(mouseY), btnMask);
         browser.sendMouseEvent(new MouseEvent(
                 TaiChiCefUtil.AWT_TAICHI_COMPONENT,
                 MouseEvent.MOUSE_RELEASED,
@@ -223,6 +238,7 @@ public class TaiChiScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        browser.onDragOver(mouseX(mouseX), mouseY(mouseY), btnMask);
         browser.sendMouseEvent(new MouseEvent(
                 TaiChiCefUtil.AWT_TAICHI_COMPONENT,
                 MouseEvent.MOUSE_DRAGGED,
@@ -238,7 +254,7 @@ public class TaiChiScreen extends Screen {
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         double amount = scrollY > 0 ? Math.ceil(scrollY) : Math.floor(scrollY);
-        amount *= 10;
+        amount *= BROWSER_DRAW_OFFSET;
         browser.sendMouseWheelEvent(new MouseWheelEvent(
                 TaiChiCefUtil.AWT_TAICHI_COMPONENT,
                 MouseEvent.MOUSE_WHEEL,
@@ -264,7 +280,7 @@ public class TaiChiScreen extends Screen {
                 glfwKeyToAwt(keyCode),
                 KeyEvent.CHAR_UNDEFINED
         );
-
+        setScanCode(e, scanCode & 0xFF);
         browser.sendKeyEvent(e);
         super.keyPressed(keyCode, scanCode, modifiers);
         return true;
@@ -272,14 +288,16 @@ public class TaiChiScreen extends Screen {
 
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        browser.sendKeyEvent(new KeyEvent(
+        val e = new KeyEvent(
                 TaiChiCefUtil.AWT_TAICHI_COMPONENT,
                 KeyEvent.KEY_RELEASED,
                 System.currentTimeMillis(),
                 glfwModsToAwt(modifiers),
                 glfwKeyToAwt(keyCode),
                 KeyEvent.CHAR_UNDEFINED
-        ));
+        );
+        setScanCode(e, scanCode & 0xFF);
+        browser.sendKeyEvent(e);
         super.keyReleased(keyCode, scanCode, modifiers);
         return true;
     }
