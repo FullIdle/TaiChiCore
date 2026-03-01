@@ -4,9 +4,6 @@ import lombok.Getter;
 import lombok.val;
 import net.minecraft.client.Minecraft;
 import org.cef.*;
-import org.cef.browser.CefBrowser;
-import org.cef.handler.CefKeyboardHandler;
-import org.cef.misc.BoolRef;
 import org.figsq.taichicore.taichicore.TaiChiCore;
 
 import java.awt.*;
@@ -91,21 +88,6 @@ public class TaiChiCefUtil {
         cefApp = CefApp.getInstance(args, settings);
 
         cefClient = cefApp.createClient();
-
-        cefClient.addKeyboardHandler(new CefKeyboardHandler() {
-            @Override
-            public boolean onPreKeyEvent(CefBrowser browser, CefKeyEvent event, BoolRef is_keyboard_shortcut) {
-                return false;
-            }
-
-            @Override
-            public boolean onKeyEvent(CefBrowser browser, CefKeyEvent event) {
-                System.out.println("[KeyEvent] " + event.toString() +
-                        " character_int=" + (int) event.character +
-                        " unmodified_int=" + (int) event.unmodified_character);
-                return false;
-            }
-        });
 
         return initialized = true;
     }
