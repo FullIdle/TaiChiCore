@@ -25,6 +25,6 @@ public class GlfwToAwtCursor {
     }
 
     public static long glfwCursor(int awtCursorType) {
-        return cache.computeIfAbsent(awtCursorType, GLFW::glfwCreateStandardCursor);
+        return cache.computeIfAbsent(toGlfwCursorType(awtCursorType), GLFW::glfwCreateStandardCursor);
     }
 }
