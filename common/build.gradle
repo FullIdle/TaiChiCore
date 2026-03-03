@@ -3,7 +3,31 @@ repositories {
     mavenLocal()
 }
 
+configurations {
+    pack {
+        canBeResolved = true
+        canBeConsumed = false
+        transitive = true
+    }
+    compileClasspath.extendsFrom pack
+//    runtimeClasspath.extendsFrom pack
+}
+
 dependencies {
     compileOnly "com.google.code.gson:gson:2.10"
     compileOnly "com.google.guava:guava:31.1-jre"
+
+    pack 'org.openjdk.nashorn:nashorn-core:15.7'
+}
+
+jar {
+    from(configurations.pack.collect {
+        it.isDirectory() ? it : zipTree(it)
+    })
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+java {
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 }

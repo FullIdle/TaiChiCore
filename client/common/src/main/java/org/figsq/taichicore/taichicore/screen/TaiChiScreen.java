@@ -1,8 +1,10 @@
-package org.figsq.taichicore.taichicore;
+package org.figsq.taichicore.taichicore.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import lombok.Getter;
+import lombok.val;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -24,7 +26,7 @@ public class TaiChiScreen extends Screen {
     private int btnMask = 0;
 
     public TaiChiScreen(String url) {
-        super(Component.literal("TaiChi"));
+        super(Component.literal("TaiChiScreen"));
         this.url = url;
     }
 
@@ -45,6 +47,8 @@ public class TaiChiScreen extends Screen {
             resizeBrowser();
             browser.setFocus(true);
         }
+        if (this.browser.isClosed())
+            this.minecraft.player.sendSystemMessage(Component.literal("Opened the closed Screen in the browser").withStyle(ChatFormatting.RED));
     }
 
     @Override
@@ -73,10 +77,25 @@ public class TaiChiScreen extends Screen {
         buffer.addVertex(0.0F, this.height, 0.0F).setUv(0.0F, 1.0F).setColor(255, 255, 255, 255);
         buffer.addVertex(this.width, this.height, 0.0F).setUv(1.0F, 1.0F).setColor(255, 255, 255, 255);
         buffer.addVertex(this.width, 0.0F, 0.0F).setUv(1.0F, 0.0F).setColor(255, 255, 255, 255);
-        buffer.addVertex(0.0F, 0.0F, 0.0F).setUv(0.0F, 0.0F).setColor(255, 255, 255, 255);BufferUploader.drawWithShader(buffer.build());
+        buffer.addVertex(0.0F, 0.0F, 0.0F).setUv(0.0F, 0.0F).setColor(255, 255, 255, 255);
+        BufferUploader.drawWithShader(buffer.build());
         RenderSystem.setShaderTexture(0, 0);
         RenderSystem.enableDepthTest();
         RenderSystem.disableBlend();
+
+
+        //渲染拖拽的数据
+        if (browser.isDragging() && browser.getCurrentDragData() != null) {
+            val dragData = browser.getCurrentDragData();
+            val text = dragData.isLink() ? (dragData.getLinkTitle().isEmpty() ? dragData.getLinkURL() : dragData.getLinkTitle())
+                    : dragData.isFragment() ? dragData.getFragmentText()
+                    : dragData.isFile() ? dragData.getFileName()
+                    : null;
+            if (text != null && !text.isEmpty()) if (text.length() > 8)
+                guiGraphics.renderTooltip(font, Component.literal(text.substring(0, 8) + "..."), mouseX, mouseY);
+            else
+                guiGraphics.renderTooltip(font, Component.literal(text), mouseX, mouseY);
+        }
     }
 
     private int mouseX(double x) {

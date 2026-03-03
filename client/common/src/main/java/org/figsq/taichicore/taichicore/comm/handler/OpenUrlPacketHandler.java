@@ -2,7 +2,7 @@ package org.figsq.taichicore.taichicore.comm.handler;
 
 import lombok.val;
 import net.minecraft.client.Minecraft;
-import org.figsq.taichicore.taichicore.TaiChiScreen;
+import org.figsq.taichicore.taichicore.screen.TaiChiScreen;
 import org.figsq.taichicore.taichicore.common.comm.IPacketHandler;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.OpenUrlPacket;
 

@@ -2,8 +2,9 @@ package org.figsq.taichicore.taichicore.common.comm;
 
 import com.google.common.io.ByteStreams;
 import lombok.val;
+import org.figsq.taichicore.taichicore.common.comm.packets.client.CleanUpGuiConfigPacket;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.OpenUrlPacket;
-import org.figsq.taichicore.taichicore.common.comm.packets.client.UpdateConfigPacket;
+import org.figsq.taichicore.taichicore.common.comm.packets.client.UpdateGuiConfigPacket;
 import org.figsq.taichicore.taichicore.common.comm.packets.server.CustomPacket;
 
 import java.lang.reflect.Constructor;
@@ -32,7 +33,8 @@ public abstract class CommManager<S> {
      * 注册公共的所有的包
      */
     public void registerPackets() {
-        registerPacket(UpdateConfigPacket.class);
+        registerPacket(UpdateGuiConfigPacket.class);
+        registerPacket(CleanUpGuiConfigPacket.class);
         registerPacket(CustomPacket.class);
         registerPacket(OpenUrlPacket.class);
     }

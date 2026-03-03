@@ -8,7 +8,7 @@ import me.fullidle.ficore.ficore.common.api.commands.args.player.MultiplayerArgs
 import me.fullidle.ficore.ficore.common.api.commands.args.types.StringArgs;
 import org.bukkit.entity.Player;
 import org.figsq.taichicore.taichicore.comm.PluginCommManager;
-import org.figsq.taichicore.taichicore.common.comm.config.GuiConfig;
+import org.figsq.taichicore.taichicore.common.comm.records.GuiConfig;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.OpenUrlPacket;
 import org.figsq.taichicore.taichicore.config.GuiConfigManager;
 
@@ -21,15 +21,15 @@ import static me.fullidle.ficore.ficore.common.api.commands.CommandBuilder.build
 import static org.figsq.taichicore.taichicore.command.Commands.permission;
 
 public class OpenCommand {
-    public static Args<GuiConfig> CONFIG_ARGS = new Args<>() {
+    public static Args<GuiConfig> CONFIG_ARGS = new Args<GuiConfig>() {
         @Override
         public GuiConfig parse(Context context, String s) {
-            return GuiConfigManager.configs.stream().filter(config -> config.identity.equals(s)).findFirst().orElse(null);
+            return GuiConfigManager.configs.stream().filter(config -> config.identifier.equals(s)).findFirst().orElse(null);
         }
 
         @Override
         public List<String> prompts() {
-            return GuiConfigManager.configs.stream().map(c -> c.identity).collect(Collectors.toList());
+            return GuiConfigManager.configs.stream().map(c -> c.identifier).collect(Collectors.toList());
         }
     };
 

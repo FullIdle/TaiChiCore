@@ -145,8 +145,14 @@ public class TaiChiCefBrowser extends CefBrowserOsr {
     @Override
     public void close(boolean force) {
         this.cancelDrag();
+        this.onCursorChange(this, 0);
         Minecraft.getInstance().execute(renderer::cleanup);
         super.close(force);
+    }
+
+    @Override
+    public boolean isClosed() {
+        return super.isClosed();
     }
 
     @Override
@@ -188,7 +194,7 @@ public class TaiChiCefBrowser extends CefBrowserOsr {
     //拖拽逻辑
     @Override
     public boolean startDragging(CefBrowser browser, CefDragData dragData, int mask, int x, int y) {
-        currentDragData = dragData;
+        currentDragData = dragData.clone();
         currentDragMask = mask;
         isDragging = true;
         dragTargetDragEnter(dragData, new Point(x, y), 0, mask);

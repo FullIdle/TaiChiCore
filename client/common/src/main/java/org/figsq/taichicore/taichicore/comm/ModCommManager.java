@@ -7,11 +7,12 @@ import net.minecraft.resources.ResourceLocation;
 import org.figsq.taichicore.taichicore.TaiChiCore;
 import org.figsq.taichicore.taichicore.comm.handler.OpenUrlPacketHandler;
 import org.figsq.taichicore.taichicore.comm.handler.SetHUDPacketHandler;
-import org.figsq.taichicore.taichicore.comm.handler.UpdateConfigPacketHandler;
+import org.figsq.taichicore.taichicore.comm.handler.GuiConfigPacketHandler;
 import org.figsq.taichicore.taichicore.common.comm.CommManager;
+import org.figsq.taichicore.taichicore.common.comm.packets.client.CleanUpGuiConfigPacket;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.OpenUrlPacket;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.SetHUDPacket;
-import org.figsq.taichicore.taichicore.common.comm.packets.client.UpdateConfigPacket;
+import org.figsq.taichicore.taichicore.common.comm.packets.client.UpdateGuiConfigPacket;
 import org.jetbrains.annotations.NotNull;
 
 public class ModCommManager extends CommManager<Object> {
@@ -36,7 +37,8 @@ public class ModCommManager extends CommManager<Object> {
 
     @Override
     public void registerHandler() {
-        registerHandler(UpdateConfigPacket.class, UpdateConfigPacketHandler.INSTANCE);
+        registerHandler(UpdateGuiConfigPacket.class, GuiConfigPacketHandler.UPDATE);
+        registerHandler(CleanUpGuiConfigPacket.class, GuiConfigPacketHandler.CLEANUP);
         registerHandler(OpenUrlPacket.class, OpenUrlPacketHandler.INSTANCE);
         registerHandler(SetHUDPacket.class, SetHUDPacketHandler.INSTANCE);
     }

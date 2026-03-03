@@ -6,6 +6,7 @@
   "client": [
     "MixinClientPackSource",
     "MixinGameRenderer",
+    "MixinMinecraft",
     "MixinOptionInstance"
   ],
   "mixins": [

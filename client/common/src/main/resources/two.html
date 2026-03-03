@@ -652,6 +652,13 @@
         localStorage.setItem("theme", theme);
     }
 
+    //发向服务端
+    taichi({
+        action: '发送自定义数据包',
+        identifier: '自定义数据包标识',
+        data: "数据内容"
+    }).then(result => console.log(result))
+
     // 页面加载时恢复保存的主题
     window.onload = function () {
         const savedTheme = localStorage.getItem("theme");

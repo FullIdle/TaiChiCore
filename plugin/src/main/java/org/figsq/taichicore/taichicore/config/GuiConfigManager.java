@@ -3,7 +3,7 @@ package org.figsq.taichicore.taichicore.config;
 import lombok.val;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.figsq.taichicore.taichicore.TaiChiCore;
-import org.figsq.taichicore.taichicore.common.comm.config.GuiConfig;
+import org.figsq.taichicore.taichicore.common.comm.records.GuiConfig;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,10 +23,11 @@ public class GuiConfigManager {
         if (files != null) for (File file : files) {
             val config = new GuiConfig();
             val yaml = YamlConfiguration.loadConfiguration(file);
-            config.identity = yaml.getString("identity");
-            config.type = GuiConfig.Type.valueOf(yaml.getString("type").toUpperCase());
-            config.match = yaml.getString("match");
+            config.identifier = yaml.getString("identifier");
+            config.matchScript = yaml.getString("match-script");
             config.url = yaml.getString("url");
+            config.persistent = yaml.getBoolean("persistent", false);
+            config.reload = yaml.getBoolean("reload", false);
             configs.add(config);
         }
     }

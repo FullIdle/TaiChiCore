@@ -19,6 +19,7 @@ dependencies {
     pack rootProject.project(":common")
 }
 
+
 processResources {
     filteringCharset 'UTF-8'
     filesMatching('plugin.yml') {
@@ -32,4 +33,8 @@ jar {
     })
     exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+java {
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 }

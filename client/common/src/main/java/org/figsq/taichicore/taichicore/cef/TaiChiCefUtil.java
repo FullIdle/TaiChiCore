@@ -5,6 +5,8 @@ import lombok.val;
 import net.minecraft.client.Minecraft;
 import org.cef.*;
 import org.figsq.taichicore.taichicore.TaiChiCore;
+import org.figsq.taichicore.taichicore.cef.handler.load.TaiChiCefLoadHandler;
+import org.figsq.taichicore.taichicore.cef.handler.query.TaiChiCefQueryHandler;
 
 import java.awt.*;
 import java.io.File;
@@ -28,7 +30,7 @@ public class TaiChiCefUtil {
     @Getter
     private static CefClient cefClient;
 
-    private static HashSet<TaiChiCefBrowser> browserSet = new HashSet<>();
+    private static final HashSet<TaiChiCefBrowser> browserSet = new HashSet<>();
 
     public static void addBrowser(TaiChiCefBrowser browser) {
         browserSet.add(browser);
@@ -88,6 +90,9 @@ public class TaiChiCefUtil {
         cefApp = CefApp.getInstance(args, settings);
 
         cefClient = cefApp.createClient();
+
+        cefClient.addMessageRouter(TaiChiCefQueryHandler.ROUTER);
+        cefClient.addLoadHandler(TaiChiCefLoadHandler.INSTANCE);
 
         return initialized = true;
     }

@@ -6,25 +6,25 @@ import org.figsq.taichicore.taichicore.common.comm.CommManager;
 import org.figsq.taichicore.taichicore.common.comm.IPacket;
 
 public class CustomPacket implements IPacket {
-    public String identity;
+    public String identifier;
     public String data;
 
     public CustomPacket() {}
 
-    public CustomPacket(String identity, String data) {
-        this.identity = identity;
+    public CustomPacket(String identifier, String data) {
+        this.identifier = identifier;
         this.data = data;
     }
 
     @Override
     public void encode(ByteArrayDataOutput output, CommManager<?> commManager) {
-        output.writeUTF(identity);
+        output.writeUTF(identifier);
         output.writeUTF(data);
     }
 
     @Override
     public void decode(ByteArrayDataInput input, CommManager<?> commManager) {
-        identity = input.readUTF();
+        identifier = input.readUTF();
         data = input.readUTF();
     }
 }

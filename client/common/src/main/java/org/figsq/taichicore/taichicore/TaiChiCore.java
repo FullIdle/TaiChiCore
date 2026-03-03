@@ -8,12 +8,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.commands.CommandSourceStack;
 import org.figsq.taichicore.taichicore.comm.ModCommManager;
-import org.figsq.taichicore.taichicore.common.comm.config.GuiConfig;
+import org.figsq.taichicore.taichicore.screen.TaiChiScreen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
@@ -32,7 +29,6 @@ public abstract class TaiChiCore {
                         TaiChiCore.HUB.getBrowser().loadURL(url);
                         return 1;
                     })));
-    public static List<GuiConfig> guiConfigs = new ArrayList<>();
     public static TaiChiCore INSTANCE;
     public static final String MOD_ID = "taichicore";
     public static final String MOD_NAME = "TaiChiCore";
@@ -53,7 +49,6 @@ public abstract class TaiChiCore {
     }
 
     public void renderHUD(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        if (HUB == null) return;
         val minecraft = Minecraft.getInstance();
         val newWidth = minecraft.getWindow().getGuiScaledWidth();
         val newHeight = minecraft.getWindow().getGuiScaledHeight();
