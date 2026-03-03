@@ -118,4 +118,8 @@ public class TaiChiCefUtil {
         if (OS.isWindows()) return "win64";
         throw new UnsupportedOperationException("Unsupported OS: " + OS.getOSType().name());
     }
+
+    public static void updateAllFrameRateLimit(int newFrameRateLimit) {
+        browserSet.forEach(b -> b.setWindowlessFrameRate(newFrameRateLimit));
+    }
 }
