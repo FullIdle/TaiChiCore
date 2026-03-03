@@ -26,6 +26,15 @@ allprojects {
     loom {
         silentMojangMappingsLicense()
         accessWidenerPath = aw
+
+        runs {
+            client {
+                vmArgs "-Dfile.encoding=UTF-8", "-Dstdout.encoding=UTF-8"
+            }
+            server {
+                vmArgs "-Dfile.encoding=UTF-8", "-Dstdout.encoding=UTF-8"
+            }
+        }
     }
 
     java {
