@@ -28,6 +28,9 @@ dependencies {
 
     common(project(path: ':client:common', configuration: 'namedElements')) { transitive = false }
     shadowBundle project(path: ':client:common', configuration: 'transformProductionFabric')
+
+    modImplementation 'org.openjdk.nashorn:nashorn-core:15.4'
+    shadowBundle('org.openjdk.nashorn:nashorn-core:15.4') {transitive = false}
 }
 
 processResources {

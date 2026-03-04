@@ -12,7 +12,7 @@ import org.figsq.taichicore.taichicore.common.util.GsonUtil;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.HashMap;
 
 /**
  * @see org.figsq.taichicore.taichicore.cef.handler.load.TaiChiCefLoadHandler 可看到加载结束后执行的JS
@@ -22,7 +22,8 @@ public class TaiChiCefQueryHandler extends CefMessageRouterHandlerAdapter {
     public static final CefMessageRouter ROUTER = CefMessageRouter.create(INSTANCE);
     private static final HashMap<String, Class<? extends ContextHandler>> HANDLERS = new HashMap<>();
 
-    private TaiChiCefQueryHandler(){}
+    private TaiChiCefQueryHandler() {
+    }
 
     @Override
     public boolean onQuery(CefBrowser browser, CefFrame frame, long queryId, String request, boolean persistent, CefQueryCallback callback) {
@@ -40,7 +41,7 @@ public class TaiChiCefQueryHandler extends CefMessageRouterHandlerAdapter {
             }
             val contextHandler = gson.fromJson(jsonObject, clazz);
             try {
-                callback.success(contextHandler.onQuery(browser, frame, queryId, request, persistent));
+                callback.success(contextHandler.onQuery(browser, frame, queryId, jsonObject, persistent));
             } catch (Exception e) {
                 StringWriter sw = new StringWriter();
                 e.printStackTrace(new PrintWriter(sw));
@@ -63,6 +64,38 @@ public class TaiChiCefQueryHandler extends CefMessageRouterHandlerAdapter {
     }
 
     static {
-        register(SendCustomPacketHandler.class, "sendCustomPacket", "发送自定义数据包");
+        register(
+                SendCustomPacketHandler.class,
+                "customPacket",
+                "sendCustomPacket",
+                "发送自定义数据包",
+                "自定义数据包"
+        );
+        register(
+                JavaScriptHandler.class,
+                "evalJavaScript",
+                "evalJS",
+                "js",
+                "javascript",
+                "js脚本",
+                "执行js脚本"
+        );
+        register(
+                ChatMessageHandler.class,
+                "chat",
+                "chatMessage",
+                "chatMsg",
+                "发送聊天信息",
+                "聊天信息"
+        );
+        register(
+                SystemMessageHandler.class,
+                "systemMessage",
+                "message",
+                "系统信息",
+                "信息",
+                "系统提示",
+                "提示"
+        );
     }
 }

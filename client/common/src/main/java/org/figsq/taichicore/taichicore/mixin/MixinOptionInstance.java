@@ -14,7 +14,9 @@ public class MixinOptionInstance<T> {
     @Inject(method = "set", at = @At("HEAD"))
     public void set(T object, CallbackInfo ci) {
         val minecraft = Minecraft.getInstance();
-        val instance = minecraft.options.framerateLimit();
+        val options = minecraft.options;
+        if (options == null) return;
+        val instance = options.framerateLimit();
         if (!this.equals(instance)) return;
         TaiChiCefUtil.updateAllFrameRateLimit(((Integer) object));
     }

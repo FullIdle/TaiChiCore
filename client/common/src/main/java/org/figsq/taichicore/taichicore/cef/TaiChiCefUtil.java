@@ -5,6 +5,7 @@ import lombok.val;
 import net.minecraft.client.Minecraft;
 import org.cef.*;
 import org.figsq.taichicore.taichicore.TaiChiCore;
+import org.figsq.taichicore.taichicore.cef.handler.TaiChiCefDisplayHandler;
 import org.figsq.taichicore.taichicore.cef.handler.load.TaiChiCefLoadHandler;
 import org.figsq.taichicore.taichicore.cef.handler.query.TaiChiCefQueryHandler;
 
@@ -93,6 +94,7 @@ public class TaiChiCefUtil {
 
         cefClient.addMessageRouter(TaiChiCefQueryHandler.ROUTER);
         cefClient.addLoadHandler(TaiChiCefLoadHandler.INSTANCE);
+        cefClient.addDisplayHandler(TaiChiCefDisplayHandler.INSTANCE);
 
         return initialized = true;
     }

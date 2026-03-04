@@ -10,8 +10,13 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import org.figsq.taichicore.taichicore.TaiChiCore;
 import org.figsq.taichicore.taichicore.comm.ModCommManager;
 import org.figsq.taichicore.taichicore.comm.ReceivePacket;
+import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
+
+import javax.script.ScriptEngine;
 
 public class TaiChiCoreFabric extends TaiChiCore implements ModInitializer {
+    public static final ScriptEngine SCRIPT_ENGINE = new NashornScriptEngineFactory().getScriptEngine(TaiChiCoreFabric.class.getClassLoader());
+
     @Override
     public void onInitialize() {
         this.init();
@@ -30,5 +35,10 @@ public class TaiChiCoreFabric extends TaiChiCore implements ModInitializer {
         val buf = PacketByteBufs.create();
         buf.writeBytes(bytes);
         ClientPlayNetworking.send(new ReceivePacket(bytes));
+    }
+
+    @Override
+    public ScriptEngine getScriptEngine() {
+        return SCRIPT_ENGINE;
     }
 }

@@ -3,6 +3,7 @@ package org.figsq.taichicore.taichicore.cef.handler.load;
 import org.cef.browser.CefBrowser;
 import org.cef.browser.CefFrame;
 import org.cef.handler.CefLoadHandlerAdapter;
+import org.cef.network.CefRequest;
 
 public class TaiChiCefLoadHandler extends CefLoadHandlerAdapter {
     public static final TaiChiCefLoadHandler INSTANCE = new TaiChiCefLoadHandler();
@@ -24,8 +25,10 @@ public class TaiChiCefLoadHandler extends CefLoadHandlerAdapter {
             };""";
 
     @Override
-    public void onLoadEnd(CefBrowser browser, CefFrame frame, int httpStatusCode) {
+    public void onLoadStart(CefBrowser browser, CefFrame frame, CefRequest.TransitionType transitionType) {
         if (!frame.isMain()) return;
+        System.out.println("exec");
         browser.executeJavaScript(TAI_CHI_JS_FUNCTION, frame.getURL(), 0);
+        super.onLoadStart(browser, frame, transitionType);
     }
 }

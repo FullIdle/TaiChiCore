@@ -652,11 +652,26 @@
         localStorage.setItem("theme", theme);
     }
 
+    window.taichi = function(params) {
+        return new Promise((resolve, reject) => {
+            window.cefQuery({
+                request: 'taichicore:' + JSON.stringify(params),
+                onSuccess: resolve,
+                onFailure: (code, msg) => reject({code, msg})
+            });
+        });
+    }
+
     //发向服务端
     taichi({
         action: '发送自定义数据包',
         identifier: '自定义数据包标识',
         data: "数据内容"
+    }).then(result => console.log(result))
+
+    taichi({
+        action: 'js',
+        script: "Java.type('net.minecraft.client.Minecraft').getInstance()"
     }).then(result => console.log(result))
 
     // 页面加载时恢复保存的主题

@@ -3,21 +3,22 @@ package org.figsq.taichicore.taichicore.cef.handler.query;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.val;
+import net.minecraft.client.Minecraft;
 import org.cef.browser.CefBrowser;
 import org.cef.browser.CefFrame;
-import org.figsq.taichicore.taichicore.comm.ModCommManager;
-import org.figsq.taichicore.taichicore.common.comm.packets.server.CustomPacket;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
 @Setter
-public class SendCustomPacketHandler implements ContextHandler {
-    private String identifier;
-    private String data;
+public class ChatMessageHandler implements ContextHandler{
+    private String message;
 
     @Override
     public @NotNull String onQuery(CefBrowser browser, CefFrame frame, long queryId, JsonObject source, boolean persistent) {
-        ModCommManager.INSTANCE.sendTo(null, new CustomPacket(identifier, data));
+        val player = Minecraft.getInstance().player;
+        if (player == null) throw new RuntimeException("player is null");
+        player.connection.sendChat(message);
         return "ok";
     }
 }

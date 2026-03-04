@@ -1,5 +1,6 @@
 package org.figsq.taichicore.taichicore.cef.handler.query;
 
+import com.google.gson.JsonObject;
 import org.cef.browser.CefBrowser;
 import org.cef.browser.CefFrame;
 import org.jetbrains.annotations.NotNull;
@@ -11,5 +12,5 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface ContextHandler {
     @NotNull
-    String onQuery(CefBrowser browser, CefFrame frame, long queryId, String request, boolean persistent);
+    String onQuery(CefBrowser browser, CefFrame frame, long queryId, JsonObject source, boolean persistent);
 }

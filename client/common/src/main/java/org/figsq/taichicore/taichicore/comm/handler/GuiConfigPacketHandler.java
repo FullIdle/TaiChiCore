@@ -3,6 +3,7 @@ package org.figsq.taichicore.taichicore.comm.handler;
 import lombok.val;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import org.figsq.taichicore.taichicore.TaiChiCore;
 import org.figsq.taichicore.taichicore.common.comm.IPacketHandler;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.CleanUpGuiConfigPacket;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.UpdateGuiConfigPacket;
@@ -10,9 +11,11 @@ import org.figsq.taichicore.taichicore.common.comm.records.GuiConfig;
 import org.figsq.taichicore.taichicore.screen.GuiConfigScreen;
 import org.jetbrains.annotations.Nullable;
 
+import javax.script.ScriptContext;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class GuiConfigPacketHandler {
     public static final IPacketHandler<UpdateGuiConfigPacket, Object> UPDATE = new IPacketHandler<>() {
@@ -35,7 +38,7 @@ public class GuiConfigPacketHandler {
     public static final IPacketHandler<CleanUpGuiConfigPacket, Object> CLEANUP = new IPacketHandler<>() {
         @Override
         public void handle(CleanUpGuiConfigPacket packet, Object sender) {
-            Minecraft.getInstance().execute(()->{
+            Minecraft.getInstance().execute(() -> {
                 for (Map.Entry<GuiConfig, GuiConfigScreen> entry : SCREEN_CACHE.values()) {
                     val value = entry.getValue();
                     if (value == null) return;
@@ -56,6 +59,7 @@ public class GuiConfigPacketHandler {
 
     /**
      * 判断是否需要给界面套浏览器界面
+     *
      * @param screen 需要判断的界面
      * @return 最终的界面 可能为空
      */
@@ -67,7 +71,7 @@ public class GuiConfigPacketHandler {
 
         for (val entry : SCREEN_CACHE.values()) {
             val guiConfig = entry.getKey();
-            if (guiConfig.matchScript == null || !guiConfig.match(titleName, title)) continue;
+            if (guiConfig.matchScript == null || !match(guiConfig, titleName, title)) continue;
             return resolveScreen(entry, guiConfig, screen);
         }
         return null;
@@ -87,5 +91,22 @@ public class GuiConfigPacketHandler {
         val newGcs = new GuiConfigScreen(guiConfig, screen);
         entry.setValue(newGcs);
         return newGcs;
+    }
+
+
+    public static boolean match(GuiConfig guiConfig, String titleName, Object title) {
+        val rs = TaiChiCore.INSTANCE.evalScript(Objects.requireNonNull(guiConfig.matchScript, "GuiConfig#match(String titleName) match-script is null"), context -> {
+            if (title != null) context.setAttribute("title", title, ScriptContext.ENGINE_SCOPE);
+            if (titleName == null) throw new RuntimeException("GuiConfig#match(String titleName) titleName is null");
+            context.setAttribute("titleName", titleName, ScriptContext.ENGINE_SCOPE);
+        });
+        if (rs == null) throw new RuntimeException("GuiConfig#match(String titleName) script return null");
+        if (rs instanceof Boolean) return (Boolean) rs;
+        if (rs instanceof String) return rs.equals(titleName);
+        throw new RuntimeException("GuiConfig#match(String titleName) script return " + rs.getClass().getName());
+    }
+
+    public static boolean match(GuiConfig guiConfig, String titleName) {
+        return match(guiConfig, titleName, null);
     }
 }

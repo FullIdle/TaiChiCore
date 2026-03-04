@@ -14,11 +14,16 @@ import net.neoforged.neoforge.network.registration.HandlerThread;
 import org.figsq.taichicore.taichicore.TaiChiCore;
 import org.figsq.taichicore.taichicore.comm.ModCommManager;
 import org.figsq.taichicore.taichicore.comm.ReceivePacket;
+import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
+
+import javax.script.ScriptEngine;
 
 import static org.figsq.taichicore.TaiChiCoreNeoForge.MOD_ID;
 
 @Mod(MOD_ID)
 public class TaiChiCoreNeoForge extends TaiChiCore {
+    public static final ScriptEngine SCRIPT_ENGINE = new NashornScriptEngineFactory().getScriptEngine(TaiChiCoreNeoForge.class.getClassLoader());
+
     public TaiChiCoreNeoForge(IEventBus bus) {
         this.init();
         NeoForge.EVENT_BUS.register(this);
@@ -47,6 +52,11 @@ public class TaiChiCoreNeoForge extends TaiChiCore {
     @Override
     public void sendToServer(byte[] bytes) {
         PacketDistributor.sendToServer(new ReceivePacket(bytes));
+    }
+
+    @Override
+    public ScriptEngine getScriptEngine() {
+        return SCRIPT_ENGINE;
     }
 
     @SubscribeEvent
