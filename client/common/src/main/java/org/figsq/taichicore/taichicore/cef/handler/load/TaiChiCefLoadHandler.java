@@ -27,7 +27,6 @@ public class TaiChiCefLoadHandler extends CefLoadHandlerAdapter {
     @Override
     public void onLoadStart(CefBrowser browser, CefFrame frame, CefRequest.TransitionType transitionType) {
         if (!frame.isMain()) return;
-        System.out.println("exec");
         browser.executeJavaScript(TAI_CHI_JS_FUNCTION, frame.getURL(), 0);
         super.onLoadStart(browser, frame, transitionType);
     }
