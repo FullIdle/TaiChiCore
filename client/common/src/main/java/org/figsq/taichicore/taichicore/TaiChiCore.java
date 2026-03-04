@@ -33,14 +33,20 @@ public abstract class TaiChiCore {
                     })))
                     .then(literal("huburl").then(argument("huburl", StringArgumentType.greedyString()).executes(context -> {
                         val url = StringArgumentType.getString(context, "huburl");
-                        TaiChiCore.HUB.getBrowser().loadURL(url);
+                        TaiChiCore.HUD.getBrowser().loadURL(url);
+                        TaiChiCore.renderHUD = true;
                         return 1;
-                    })));
+                    })))
+                    .then(literal("closehud").executes(context -> {
+                        TaiChiCore.renderHUD = false;
+                        return 1;
+                    }));
     public static TaiChiCore INSTANCE;
     public static final String MOD_ID = "taichicore";
     public static final String MOD_NAME = "TaiChiCore";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static final TaiChiScreen HUB = new TaiChiScreen("C:\\Users\\COLORFUL\\Downloads\\test.html");
+    public static final TaiChiScreen HUD = new TaiChiScreen("C:\\Users\\COLORFUL\\Downloads\\test.html");
+    public static boolean renderHUD = true;
 
     public TaiChiCore() {
         INSTANCE = this;
@@ -56,13 +62,14 @@ public abstract class TaiChiCore {
     }
 
     public void renderHUD(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+        if (!renderHUD) return;
         val minecraft = Minecraft.getInstance();
         val newWidth = minecraft.getWindow().getGuiScaledWidth();
         val newHeight = minecraft.getWindow().getGuiScaledHeight();
-        if (HUB.width != newWidth || HUB.height != newHeight)
-            if (HUB.getBrowser() == null) HUB.init(minecraft, newWidth, newHeight);
-            else HUB.resize(minecraft, newWidth, newHeight);
-        HUB.render(guiGraphics, HUB.width / 2, HUB.height / 2, deltaTracker.getGameTimeDeltaPartialTick(true));
+        if (HUD.width != newWidth || HUD.height != newHeight)
+            if (HUD.getBrowser() == null) HUD.init(minecraft, newWidth, newHeight);
+            else HUD.resize(minecraft, newWidth, newHeight);
+        HUD.render(guiGraphics, HUD.width / 2, HUD.height / 2, deltaTracker.getGameTimeDeltaPartialTick(true));
     }
 
     public abstract void initPlatformComm();

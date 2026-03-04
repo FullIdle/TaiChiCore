@@ -662,6 +662,11 @@
         });
     }
 
+    fetch('taichi://test/hello?name=Steve&age=18')
+        .then(r => r.text())
+        .then(console.log)
+        .catch(console.error);
+
     //发向服务端
     taichi({
         action: '发送自定义数据包',

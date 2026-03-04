@@ -12,6 +12,7 @@ public class SetHUDPacketHandler implements IPacketHandler<SetHUDPacket, Object>
     @Override
     public void handle(SetHUDPacket packet, Object sender) {
         val url = packet.url;
-        Minecraft.getInstance().execute(()-> TaiChiCore.HUB.getBrowser().loadURL(url));
+        Minecraft.getInstance().execute(()-> TaiChiCore.HUD.getBrowser().loadURL(url));
+        TaiChiCore.renderHUD = true;
     }
 }

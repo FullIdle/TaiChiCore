@@ -3,3 +3,4 @@ accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScr
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen topPos I
 accessible field com/mojang/blaze3d/pipeline/RenderTarget colorTextureId I
 accessible field com/mojang/blaze3d/platform/NativeImage pixels J
+accessible field net/minecraft/client/renderer/entity/EntityRenderDispatcher shouldRenderShadow Z

@@ -28,13 +28,17 @@
     }
 
     img {
-        height: 500px;
-        width: 500px;
+        height: 256px;
+        width: 256px;
+    }
+
+    img:hover {
+        transform: scale(1.5); /*放大到1.5倍*/
     }
 </style>
 <body>
 <h1>你好,TaiChiCore</h1>
-<img alt="" src="taichi://test.png">
+<img alt="" src="taichi://render/player?width=256&height=256&scale=1&rotX=0.0&rotY=0.0&rotZ=0.0">
 </body>
 <script>
     window.cefQuery({

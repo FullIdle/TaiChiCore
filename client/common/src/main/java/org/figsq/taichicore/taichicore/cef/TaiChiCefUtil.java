@@ -4,8 +4,11 @@ import lombok.Getter;
 import lombok.val;
 import net.minecraft.client.Minecraft;
 import org.cef.*;
+import org.cef.callback.CefSchemeRegistrar;
+import org.cef.handler.CefAppHandlerAdapter;
 import org.figsq.taichicore.taichicore.TaiChiCore;
 import org.figsq.taichicore.taichicore.cef.handler.TaiChiCefDisplayHandler;
+import org.figsq.taichicore.taichicore.cef.scheme.TaiChiResourceHandler;
 import org.figsq.taichicore.taichicore.cef.handler.load.TaiChiCefLoadHandler;
 import org.figsq.taichicore.taichicore.cef.handler.query.TaiChiCefQueryHandler;
 
@@ -88,7 +91,35 @@ public class TaiChiCefUtil {
 
         val settings = new CefSettings();
 
+        CefApp.addAppHandler(new CefAppHandlerAdapter(null) {
+            @Override
+            public void onRegisterCustomSchemes(CefSchemeRegistrar registrar) {
+                registrar.addCustomScheme(
+                        "taichi",
+                        true,
+                        false,
+                        false,
+                        true,
+                        true,
+                        false,
+                        true
+                );
+                super.onRegisterCustomSchemes(registrar);
+            }
+
+            @Override
+            public void stateHasChanged(CefApp.CefAppState state) {
+                if (state == CefApp.CefAppState.INITIALIZED)
+                    cefApp.registerSchemeHandlerFactory("taichi", "", TaiChiResourceHandler::new);
+            }
+        });
         cefApp = CefApp.getInstance(args, settings);
+
+        val version = cefApp.getVersion();
+        assert version != null;
+        TaiChiCore.LOGGER.info("cef-version: {}", version.getCefVersion());
+        TaiChiCore.LOGGER.info("chrome-version: {}", version.getChromeVersion());
+        TaiChiCore.LOGGER.info("jcef-version: {}", version.getJcefVersion());
 
         cefClient = cefApp.createClient();
 
