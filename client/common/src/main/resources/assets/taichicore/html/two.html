@@ -659,12 +659,14 @@
         action: '发送自定义数据包',
         identifier: '自定义数据包标识',
         data: "数据内容"
-    }).then(result => console.log(result))
+    })
 
     taichi({
         action: 'js',
         script: "Java.type('net.minecraft.client.Minecraft').getInstance()"
-    }).then(result => console.log(result))
+    }, {
+        onSuccess: result => console.log(result)
+    })
 
     // 页面加载时恢复保存的主题
     window.onload = function () {

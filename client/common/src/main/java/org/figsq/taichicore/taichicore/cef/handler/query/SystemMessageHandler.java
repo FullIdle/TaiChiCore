@@ -8,15 +8,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import org.cef.browser.CefBrowser;
 import org.cef.browser.CefFrame;
+import org.cef.callback.CefQueryCallback;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
 @Setter
-public class SystemMessageHandler implements ContextHandler{
-    private String message;
+public class SystemMessageHandler implements QueryHandler {
+    public static final SystemMessageHandler INSTANCE = new SystemMessageHandler();
 
     @Override
-    public @NotNull String onQuery(CefBrowser browser, CefFrame frame, long queryId, JsonObject source, boolean persistent) {
+    public @NotNull String onQuery(CefBrowser browser, CefFrame frame, long queryId, JsonObject source, boolean persistent, CefQueryCallback callback) {
+        val message = source.get("message").getAsString();
         val player = Minecraft.getInstance().player;
         if (player == null) throw new RuntimeException("player is null");
         player.sendSystemMessage(Component.literal(message));

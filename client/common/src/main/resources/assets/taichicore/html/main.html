@@ -42,8 +42,8 @@
         display: inline-block; /* 自定义元素默认inline，transform对inline元素无效 */
         border: 2px solid red; /*描边*/
         /*通常情况下，width最好和要渲染元素的width一样，这样更好控制*/
-        width: 200px; /*现实的大小(实际上不是渲染结果的大小渲染结果，在使用组件的时候就需要定义好)*/
-        height: 100px; /*这个大小只是让显示的框，也就是画布的大小而已*/
+        width: 256px; /*现实的大小(实际上不是渲染结果的大小渲染结果，在使用组件的时候就需要定义好)*/
+        height: 256px; /*这个大小只是让显示的框，也就是画布的大小而已*/
     /*    左边是之前的taichi://render/player静态图 右边是实时渲染画布*/
     }
 
@@ -51,13 +51,14 @@
         transform: scale(5);
     }
 </style>
+<!--导入taichi-->
 <script src="D:\IdeaProjects\TaiChiCore\client\common\src\main\resources\assets\taichicore\html\script\taichi.js"></script>
 <body>
 <h1>你好,TaiChiCore</h1>
-<!--导入组件-->
+<!--静态渲染实体图片-->
 <img alt="" src="taichi://render/player?width=256&height=256&scale=1&rotX=0.0&rotY=0.0&rotZ=0.0">
-<!--使用渲染玩家组件-->
-<taichi-render-player class="test" roX="0.0"></taichi-render-player>
+<!--实时渲染玩家组件 画布-->
+<taichi-render class="test" type="player" width="256" height="256"></taichi-render>
 </body>
 <script>
 </script>

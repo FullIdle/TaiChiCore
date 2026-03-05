@@ -14,13 +14,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
 
-/**
- * @see org.figsq.taichicore.taichicore.cef.handler.load.TaiChiCefLoadHandler 可看到加载结束后执行的JS
- */
 public class TaiChiCefQueryHandler extends CefMessageRouterHandlerAdapter {
     public static final TaiChiCefQueryHandler INSTANCE = new TaiChiCefQueryHandler();
     public static final CefMessageRouter ROUTER = CefMessageRouter.create(INSTANCE);
-    private static final HashMap<String, Class<? extends ContextHandler>> HANDLERS = new HashMap<>();
+    private static final HashMap<String, QueryHandler> HANDLERS = new HashMap<>();
 
     private TaiChiCefQueryHandler() {
     }
@@ -34,14 +31,14 @@ public class TaiChiCefQueryHandler extends CefMessageRouterHandlerAdapter {
             val gson = GsonUtil.getGson();
             val jsonObject = gson.fromJson(jsonStr, JsonObject.class);
             val actionName = jsonObject.get("action").getAsString();
-            val clazz = HANDLERS.get(actionName);
-            if (clazz == null) {
+            val handler = HANDLERS.get(actionName);
+            if (handler == null) {
                 callback.failure(-1, "Unknown action name: " + actionName);
                 return true;
             }
-            val contextHandler = gson.fromJson(jsonObject, clazz);
             try {
-                callback.success(contextHandler.onQuery(browser, frame, queryId, jsonObject, persistent));
+                val response = handler.onQuery(browser, frame, queryId, jsonObject, persistent, callback);
+                if (response != null) callback.success(response);
             } catch (Exception e) {
                 StringWriter sw = new StringWriter();
                 e.printStackTrace(new PrintWriter(sw));
@@ -57,22 +54,23 @@ public class TaiChiCefQueryHandler extends CefMessageRouterHandlerAdapter {
 
     @Override
     public void onQueryCanceled(CefBrowser browser, CefFrame frame, long queryId) {
+
     }
 
-    private static void register(Class<? extends ContextHandler> chClazz, String... names) {
-        for (String name : names) HANDLERS.put(name, chClazz);
+    private static void register(QueryHandler handler, String... names) {
+        for (String name : names) HANDLERS.put(name, handler);
     }
 
     static {
         register(
-                SendCustomPacketHandler.class,
+                SendCustomPacketHandler.INSTANCE,
                 "customPacket",
                 "sendCustomPacket",
                 "发送自定义数据包",
                 "自定义数据包"
         );
         register(
-                JavaScriptHandler.class,
+                JavaScriptHandler.INSTANCE,
                 "evalJavaScript",
                 "evalJS",
                 "js",
@@ -81,7 +79,7 @@ public class TaiChiCefQueryHandler extends CefMessageRouterHandlerAdapter {
                 "执行js脚本"
         );
         register(
-                ChatMessageHandler.class,
+                ChatMessageHandler.INSTANCE,
                 "chat",
                 "chatMessage",
                 "chatMsg",
@@ -89,13 +87,18 @@ public class TaiChiCefQueryHandler extends CefMessageRouterHandlerAdapter {
                 "聊天信息"
         );
         register(
-                SystemMessageHandler.class,
+                SystemMessageHandler.INSTANCE,
                 "systemMessage",
                 "message",
                 "系统信息",
                 "信息",
                 "系统提示",
                 "提示"
+        );
+        register(
+                RenderNoticeHandler.INSTANCE,
+                "renderNotice",
+                "渲染通知"
         );
     }
 }
