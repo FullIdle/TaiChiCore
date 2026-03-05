@@ -263,4 +263,11 @@ public class TaiChiScreen extends Screen {
         super.charTyped(codePoint, modifiers);
         return true;
     }
+
+    /**
+     * 某些情况下用于判断是否初始化等
+     */
+    public Minecraft getMinecraft() {
+        return this.minecraft;
+    }
 }
