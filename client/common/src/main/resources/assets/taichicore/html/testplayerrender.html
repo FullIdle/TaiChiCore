@@ -37,8 +37,8 @@
     }
 
     .test {
-        width: 256px;
-        height: 256px;
+        width: 146px;
+        height: 146px;
         display: inline-block;
     }
 
@@ -48,13 +48,11 @@
     }
 </style>
 <!--导入taichi-->
-<script src="D:\IdeaProjects\TaiChiCore\client\common\src\main\resources\assets\taichicore\html\script\taichi.js"></script>
+<script src="taichi://mod/taichicore/html/script/taichi.js"></script>
 <body>
 <h1>你好,TaiChiCore</h1>
-<!--静态渲染实体图片-->
-<img alt="" src="taichi://render/player?width=256&height=256&scale=1&rotX=0.0&rotY=0.0&rotZ=0.0">
 <!--实时渲染玩家组件 画布-->
-<taichi-render class="test" type="player" width="256" height="256"></taichi-render>
+<taichi-render class="test" type="player" width="146" height="146" rotX="0" rotY="0" rotZ="0"></taichi-render>
 </body>
 <script>
 </script>

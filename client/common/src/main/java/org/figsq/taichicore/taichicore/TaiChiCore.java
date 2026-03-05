@@ -46,6 +46,7 @@ public abstract class TaiChiCore {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final TaiChiScreen HUD = new TaiChiScreen("C:\\Users\\COLORFUL\\Downloads\\test.html");
     public static boolean renderHUD = true;
+    public static boolean isAltHeld = false;
 
     public TaiChiCore() {
         INSTANCE = this;

@@ -71,6 +71,12 @@ public class TaiChiCefBrowser extends CefBrowserOsr {
     }
 
     @Override
+    public void loadURL(String url) {
+        super.loadURL(url);
+        this.clearRenderNotice();
+    }
+
+    @Override
     public synchronized void onBeforeClose() {
         super.onBeforeClose();
         TaiChiCefUtil.removeBrowser(this);
@@ -265,6 +271,12 @@ public class TaiChiCefBrowser extends CefBrowserOsr {
     public void removeRenderNotice(long queryId) {
         synchronized (this.RENDER_NOTICE_CONTEXTS) {
             this.RENDER_NOTICE_CONTEXTS.remove(queryId);
+        }
+    }
+
+    public void clearRenderNotice() {
+        synchronized (this.RENDER_NOTICE_CONTEXTS) {
+            this.RENDER_NOTICE_CONTEXTS.clear();
         }
     }
 }

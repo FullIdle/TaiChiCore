@@ -2,6 +2,7 @@ package org.figsq.taichicore.taichicore.mixin;
 
 import lombok.val;
 import net.minecraft.client.KeyboardHandler;
+import net.minecraft.client.Minecraft;
 import org.figsq.taichicore.taichicore.TaiChiCore;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,10 +20,23 @@ public class MixinKeyboardHandler {
             GLFW.GLFW_KEY_ESCAPE
     );
 
-    @Inject(method = "keyPress", at = @At("HEAD"))
+    @Inject(method = "keyPress", at = @At("HEAD"), cancellable = true)
     private void keyPress(long window, int key, int scanCode, int action, int modifiers, CallbackInfo ci) {
         val minecraft = TaiChiCore.HUD.getMinecraft();
         if (!TaiChiCore.renderHUD || minecraft == null || minecraft.screen != null) return;
+
+        // Alt 键处理
+        if (key == GLFW.GLFW_KEY_LEFT_ALT || key == GLFW.GLFW_KEY_RIGHT_ALT) {
+            if (action == GLFW.GLFW_PRESS) {
+                TaiChiCore.isAltHeld = true;
+                Minecraft.getInstance().mouseHandler.releaseMouse();
+            } else if (action == GLFW.GLFW_RELEASE) {
+                TaiChiCore.isAltHeld = false;
+                Minecraft.getInstance().mouseHandler.grabMouse();
+            }
+            ci.cancel();
+            return;
+        }
 
         if (LIMIT_KEYS.contains(key)) return;
 
