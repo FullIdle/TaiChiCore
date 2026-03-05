@@ -11,12 +11,15 @@ import org.cef.browser.CefBrowser;
 import org.cef.browser.CefBrowserOsr;
 import org.cef.browser.CefRequestContext;
 import org.cef.callback.CefDragData;
+import org.figsq.taichicore.taichicore.cef.handler.query.RenderNoticeHandler;
 import org.figsq.taichicore.taichicore.glfwtoawt.GlfwToAwtCursor;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
 
 import java.awt.*;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -40,6 +43,9 @@ public class TaiChiCefBrowser extends CefBrowserOsr {
     private int currentDragMask;
     private int currentDragOperation;
     private boolean isDragging = false;
+
+    //渲染通知上下文记录
+    private final Map<Long, RenderNoticeHandler.NoticeContext> RENDER_NOTICE_CONTEXTS = new HashMap<>();
 
     public TaiChiCefBrowser(CefClient client,
                             String url,
@@ -241,5 +247,24 @@ public class TaiChiCefBrowser extends CefBrowserOsr {
         } catch (IncompatibleClassChangeError ignored) {
         }
         return true;
+    }
+
+    //渲染通知
+    public void renderNotices() {
+        synchronized (this.RENDER_NOTICE_CONTEXTS) {
+            this.RENDER_NOTICE_CONTEXTS.forEach((i,c)->c.update());
+        }
+    }
+
+    public void addRenderNotice(RenderNoticeHandler.NoticeContext context) {
+        synchronized (this.RENDER_NOTICE_CONTEXTS) {
+            this.RENDER_NOTICE_CONTEXTS.put(context.queryId, context);
+        }
+    }
+
+    public void removeRenderNotice(long queryId) {
+        synchronized (this.RENDER_NOTICE_CONTEXTS) {
+            this.RENDER_NOTICE_CONTEXTS.remove(queryId);
+        }
     }
 }

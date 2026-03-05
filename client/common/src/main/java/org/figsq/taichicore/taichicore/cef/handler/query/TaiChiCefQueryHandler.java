@@ -54,7 +54,7 @@ public class TaiChiCefQueryHandler extends CefMessageRouterHandlerAdapter {
 
     @Override
     public void onQueryCanceled(CefBrowser browser, CefFrame frame, long queryId) {
-
+        HANDLERS.forEach((h, k) -> k.onQueryCanceled(browser, frame, queryId));
     }
 
     private static void register(QueryHandler handler, String... names) {

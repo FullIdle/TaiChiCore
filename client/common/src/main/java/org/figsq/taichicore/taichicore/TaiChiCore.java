@@ -16,7 +16,6 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleScriptContext;
-
 import java.util.function.Consumer;
 
 import static net.minecraft.commands.Commands.argument;
@@ -46,7 +45,7 @@ public abstract class TaiChiCore {
     public static final String MOD_NAME = "TaiChiCore";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final TaiChiScreen HUD = new TaiChiScreen("C:\\Users\\COLORFUL\\Downloads\\test.html");
-    public static boolean renderHUD = false;
+    public static boolean renderHUD = true;
 
     public TaiChiCore() {
         INSTANCE = this;
