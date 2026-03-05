@@ -54,7 +54,7 @@ public final class PlayerRenderHelper {
                                            float rotX, float rotY, float rotZ) {
         Minecraft mc = Minecraft.getInstance();
 
-        if (!mc.isSameThread()) {
+        if (!mc.isSameThread() && !RenderSystem.isOnRenderThread()) {
             return CompletableFuture.supplyAsync(
                     () -> renderPlayerToPng(width, height, entitySize, rotX, rotY, rotZ), mc
             ).join();

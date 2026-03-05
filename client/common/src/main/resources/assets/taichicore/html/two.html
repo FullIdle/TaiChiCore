@@ -8,6 +8,7 @@
     <meta charset="UTF-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>主菜单</title>
+    <script src="taichi://mod/taichicore/html/script/taichi.js"></script>
     <style>
         * {
             margin: 0;
@@ -353,6 +354,7 @@
         <div class="sidebar">
             <div class="sidebar-item" onmouseover="showContent('个人信息')">
                 个人信息
+                <taichi-render-player></taichi-render-player>
             </div>
             <div class="sidebar-item" onmouseover="showContent('主菜单')">
                 主菜单
@@ -651,21 +653,6 @@
         }
         localStorage.setItem("theme", theme);
     }
-
-    window.taichi = function(params) {
-        return new Promise((resolve, reject) => {
-            window.cefQuery({
-                request: 'taichicore:' + JSON.stringify(params),
-                onSuccess: resolve,
-                onFailure: (code, msg) => reject({code, msg})
-            });
-        });
-    }
-
-    fetch('taichi://test/hello?name=Steve&age=18')
-        .then(r => r.text())
-        .then(console.log)
-        .catch(console.error);
 
     //发向服务端
     taichi({

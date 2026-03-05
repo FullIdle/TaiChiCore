@@ -9,12 +9,13 @@ import org.cef.handler.CefAppHandlerAdapter;
 import org.figsq.taichicore.taichicore.TaiChiCore;
 import org.figsq.taichicore.taichicore.cef.handler.TaiChiCefDisplayHandler;
 import org.figsq.taichicore.taichicore.cef.scheme.TaiChiResourceHandler;
-import org.figsq.taichicore.taichicore.cef.handler.load.TaiChiCefLoadHandler;
 import org.figsq.taichicore.taichicore.cef.handler.query.TaiChiCefQueryHandler;
 
 import java.awt.*;
 import java.io.File;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 public class TaiChiCefUtil {
     public static final String LIB_PATH_KEY = "jcef.path";
@@ -42,6 +43,10 @@ public class TaiChiCefUtil {
 
     public static void removeBrowser(TaiChiCefBrowser browser) {
         browserSet.remove(browser);
+    }
+
+    public static Set<TaiChiCefBrowser> getBrowserSet() {
+        return Collections.unmodifiableSet(browserSet);
     }
 
     public static boolean init() {
@@ -124,7 +129,6 @@ public class TaiChiCefUtil {
         cefClient = cefApp.createClient();
 
         cefClient.addMessageRouter(TaiChiCefQueryHandler.ROUTER);
-        cefClient.addLoadHandler(TaiChiCefLoadHandler.INSTANCE);
         cefClient.addDisplayHandler(TaiChiCefDisplayHandler.INSTANCE);
 
         return initialized = true;

@@ -236,7 +236,10 @@ public class TaiChiCefBrowser extends CefBrowserOsr {
     @Override
     public boolean onCursorChange(CefBrowser browser, int cursorType) {
         val window = Minecraft.getInstance().getWindow().getWindow();
-        GLFW.glfwSetCursor(window, GlfwToAwtCursor.glfwCursor(cursorType));
+        try {
+            GLFW.glfwSetCursor(window, GlfwToAwtCursor.glfwCursor(cursorType));
+        } catch (IncompatibleClassChangeError ignored) {
+        }
         return true;
     }
 }
