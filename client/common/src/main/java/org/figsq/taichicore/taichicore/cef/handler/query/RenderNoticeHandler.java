@@ -9,7 +9,7 @@ import org.cef.browser.CefFrame;
 import org.cef.callback.CefQueryCallback;
 import org.figsq.taichicore.taichicore.cef.TaiChiCefBrowser;
 import org.figsq.taichicore.taichicore.cef.TaiChiCefUtil;
-import org.figsq.taichicore.taichicore.cef.scheme.actions.PlayerRenderHelper;
+import org.figsq.taichicore.taichicore.cef.scheme.actions.RenderHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Base64;
@@ -45,7 +45,7 @@ public class RenderNoticeHandler implements QueryHandler {
 
             val context = switch (type) {
                 case "player" -> new NoticeContext(taiChiCefBrowser, queryId, () ->
-                        Base64.getEncoder().encodeToString(PlayerRenderHelper.renderPlayerToPng(width, height, scale, rotX, rotY, rotZ)));
+                        Base64.getEncoder().encodeToString(RenderHelper.renderPlayerToPng(width, height, scale, rotX, rotY, rotZ)));
                 default -> throw new RuntimeException("Unknown type!");
             };
 

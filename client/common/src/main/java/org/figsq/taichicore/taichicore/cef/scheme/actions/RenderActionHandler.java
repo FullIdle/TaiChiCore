@@ -1,6 +1,7 @@
 package org.figsq.taichicore.taichicore.cef.scheme.actions;
 
 import lombok.val;
+import net.minecraft.client.Minecraft;
 import org.figsq.taichicore.taichicore.cef.scheme.ActionHandler;
 import org.figsq.taichicore.taichicore.cef.scheme.TaiChiRequest;
 import org.figsq.taichicore.taichicore.cef.scheme.TaiChiResponse;
@@ -19,7 +20,7 @@ public class RenderActionHandler implements ActionHandler {
         val rotZ = request.getParam("rotZ", "0.0");
         if (argument.equals("player")) {
             return TaiChiResponse.binary(
-                    PlayerRenderHelper.renderPlayerToPng(
+                    RenderHelper.renderPlayerToPng(
                             Integer.parseInt(width),
                             Integer.parseInt(height),
                             Float.parseFloat(scale),
@@ -27,6 +28,10 @@ public class RenderActionHandler implements ActionHandler {
                             Float.parseFloat(rotY),
                             Float.parseFloat(rotZ)
                     ), ".png");
+        }
+        if (argument.equals("item")) {
+            return TaiChiResponse.binary(
+                    RenderHelper.renderInventorySlotToPng(0, 64), ".png");
         }
         return TaiChiResponse.noContent();
     }

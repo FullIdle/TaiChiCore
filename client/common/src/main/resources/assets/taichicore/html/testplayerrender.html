@@ -9,6 +9,7 @@
     * {
         /*刚刚调的时间太快，快到0.1秒都没有*/
         transition: all 1.0s; /*过度动画所用时长*/
+        user-select: none;
     }
 
     body {
@@ -51,6 +52,8 @@
 <script src="taichi://mod/taichicore/html/script/taichi.js"></script>
 <body>
 <h1>你好,TaiChiCore</h1>
+<img src="taichi://render/player?width=256&height=256&scale=1.0&rotX=0.0&rotY=0.0&rotZ=0.0" alt="">
+<img src="taichi://render/item" alt="">
 <!--实时渲染玩家组件 画布-->
 <taichi-render class="test" type="player" width="146" height="146" rotX="0" rotY="0" rotZ="0"></taichi-render>
 </body>
