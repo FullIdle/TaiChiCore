@@ -4,7 +4,7 @@ import lombok.val;
 import net.minecraft.client.Minecraft;
 import org.figsq.taichicore.taichicore.TaiChiCore;
 import org.figsq.taichicore.taichicore.common.comm.IPacketHandler;
-import org.figsq.taichicore.taichicore.common.comm.packets.server.CustomPacket;
+import org.figsq.taichicore.taichicore.common.comm.packets.common.CustomPacket;
 import org.figsq.taichicore.taichicore.screen.TaiChiScreen;
 
 //接受 服务端发送来的自定义数据包

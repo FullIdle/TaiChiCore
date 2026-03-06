@@ -3,10 +3,9 @@ package org.figsq.taichicore.taichicore.events;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
-import org.figsq.taichicore.taichicore.common.comm.packets.server.CustomPacket;
+import org.figsq.taichicore.taichicore.common.comm.packets.common.CustomPacket;
 import org.jetbrains.annotations.NotNull;
 
 /**

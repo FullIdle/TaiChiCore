@@ -14,7 +14,7 @@ import org.figsq.taichicore.taichicore.common.comm.packets.client.CleanUpGuiConf
 import org.figsq.taichicore.taichicore.common.comm.packets.client.OpenUrlPacket;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.SetHUDPacket;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.UpdateGuiConfigPacket;
-import org.figsq.taichicore.taichicore.common.comm.packets.server.CustomPacket;
+import org.figsq.taichicore.taichicore.common.comm.packets.common.CustomPacket;
 import org.jetbrains.annotations.NotNull;
 
 public class ModCommManager extends CommManager<Object> {

@@ -4,8 +4,10 @@ identifier: example
 # 那么就会直接按照字符串的匹配方式来匹配屏幕名
 # 最终结果也可以是boolean
 match-script: 自定义GUI1
-# url    {resource} 客户端侧资源包文件夹的绝对路径，尾部没有/需要手动写!
-#url: file://{resource}/gui/example.html 客户端文件路径
+# {resource} 客户端侧资源包文件夹的绝对路径
+# url: file://{resource}/gui/example.html 客户端文件路径
+# url: taichi://mod/模组名/jar内资源文件路径 模组内路径 更多taichi://方案路径去看看这里把 TODO 哎嘿我没写呢~
+# url: https://example.com/example.html 网络地址
 url: 'https://example.com/example.html'
 # 持久化 玩家关闭界面时候，不会将浏览器关闭，这样可以做到第二次打开不会黑屏（不建议给每个界面都整上那样太多了，太多垃圾设备会卡）
 persistent: false

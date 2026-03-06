@@ -8,7 +8,7 @@ import org.cef.browser.CefBrowser;
 import org.cef.browser.CefFrame;
 import org.cef.callback.CefQueryCallback;
 import org.figsq.taichicore.taichicore.comm.ModCommManager;
-import org.figsq.taichicore.taichicore.common.comm.packets.server.CustomPacket;
+import org.figsq.taichicore.taichicore.common.comm.packets.common.CustomPacket;
 import org.jetbrains.annotations.NotNull;
 
 @Getter

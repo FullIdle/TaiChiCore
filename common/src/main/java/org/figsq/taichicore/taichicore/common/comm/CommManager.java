@@ -5,7 +5,7 @@ import lombok.val;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.CleanUpGuiConfigPacket;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.OpenUrlPacket;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.UpdateGuiConfigPacket;
-import org.figsq.taichicore.taichicore.common.comm.packets.server.CustomPacket;
+import org.figsq.taichicore.taichicore.common.comm.packets.common.CustomPacket;
 
 import java.lang.reflect.Constructor;
 import java.util.*;

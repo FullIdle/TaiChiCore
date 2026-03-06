@@ -2,7 +2,6 @@ package org.figsq.taichicore.taichicore.comm;
 
 import com.google.common.collect.Sets;
 import lombok.val;
-import me.fullidle.ficore.ficore.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -10,11 +9,10 @@ import org.bukkit.scheduler.BukkitTask;
 import org.figsq.taichicore.taichicore.TaiChiCore;
 import org.figsq.taichicore.taichicore.comm.handlers.CustomPacketHandler;
 import org.figsq.taichicore.taichicore.common.comm.CommManager;
-import org.figsq.taichicore.taichicore.common.comm.packets.server.CustomPacket;
+import org.figsq.taichicore.taichicore.common.comm.packets.common.CustomPacket;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 public class PluginCommManager extends CommManager<Player> implements PluginMessageListener {
     public static final PluginCommManager INSTANCE = new PluginCommManager();
