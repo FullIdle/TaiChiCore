@@ -5,6 +5,7 @@ import lombok.val;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import org.figsq.taichicore.taichicore.TaiChiCore;
+import org.figsq.taichicore.taichicore.comm.handler.CustomPacketHandler;
 import org.figsq.taichicore.taichicore.comm.handler.OpenUrlPacketHandler;
 import org.figsq.taichicore.taichicore.comm.handler.SetHUDPacketHandler;
 import org.figsq.taichicore.taichicore.comm.handler.GuiConfigPacketHandler;
@@ -13,6 +14,7 @@ import org.figsq.taichicore.taichicore.common.comm.packets.client.CleanUpGuiConf
 import org.figsq.taichicore.taichicore.common.comm.packets.client.OpenUrlPacket;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.SetHUDPacket;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.UpdateGuiConfigPacket;
+import org.figsq.taichicore.taichicore.common.comm.packets.server.CustomPacket;
 import org.jetbrains.annotations.NotNull;
 
 public class ModCommManager extends CommManager<Object> {
@@ -41,6 +43,7 @@ public class ModCommManager extends CommManager<Object> {
         registerHandler(CleanUpGuiConfigPacket.class, GuiConfigPacketHandler.CLEANUP);
         registerHandler(OpenUrlPacket.class, OpenUrlPacketHandler.INSTANCE);
         registerHandler(SetHUDPacket.class, SetHUDPacketHandler.INSTANCE);
+        registerHandler(CustomPacket.class, CustomPacketHandler.INSTANCE);
     }
 
     @Override

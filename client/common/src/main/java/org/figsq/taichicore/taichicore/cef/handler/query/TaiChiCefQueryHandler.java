@@ -100,5 +100,13 @@ public class TaiChiCefQueryHandler extends CefMessageRouterHandlerAdapter {
                 "renderNotice",
                 "渲染通知"
         );
+        register(
+                CloseScreenHandler.INSTANCE,
+                "closeScreen",
+                "close",
+                "关闭",
+                "关闭屏幕",
+                "关闭界面"
+        );
     }
 }

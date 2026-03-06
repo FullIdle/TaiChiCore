@@ -24,7 +24,16 @@ window.taichi = function (
 };
 
 window.taichiElements = {
-    renders: {}
+    renders: {},
+    customPackets: {}
+}
+
+window.registerTaiChiCustomPacket = function (identifier, handler) {
+    window.taichiElements.customPackets[identifier] = handler;
+}
+
+window.handlerTaiChiCustomPacket = function (identifier, data) {
+    window.taichiElements.customPackets[identifier]?.(data);
 }
 
 customElements.define("taichi-render", class extends HTMLElement {

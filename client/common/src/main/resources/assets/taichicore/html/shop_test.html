@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>神兽商店</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Cinzel:wght@700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: transparent;
+    font-family: 'Noto Serif SC', serif;
+    color: #f0e8ff;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .shop-container {
+    width: 480px;
+    background: rgba(10, 5, 30, 0.82);
+    border: 1px solid rgba(180, 140, 255, 0.35);
+    border-radius: 16px;
+    backdrop-filter: blur(18px);
+    box-shadow: 0 0 60px rgba(120, 60, 255, 0.25), inset 0 0 40px rgba(80, 30, 180, 0.12);
+    overflow: hidden;
+    position: relative;
+    animation: fadeIn 0.6s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-12px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* 顶部星光 */
+  .shop-container::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%; transform: translateX(-50%);
+    width: 300px; height: 120px;
+    background: radial-gradient(ellipse, rgba(160, 100, 255, 0.3) 0%, transparent 70%);
+    pointer-events: none;
+    animation: pulse 3s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
+
+  /* 标题区 */
+  .shop-header {
+    padding: 18px 20px 12px;
+    text-align: center;
+    border-bottom: 1px solid rgba(180, 140, 255, 0.2);
+    position: relative;
+  }
+  .shop-title {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, #c8a0ff, #fff8, #a0c8ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+  }
+  .shop-subtitle {
+    font-size: 11px;
+    color: rgba(200, 160, 255, 0.6);
+    letter-spacing: 6px;
+    margin-top: 2px;
+  }
+  .close-btn {
+    position: absolute;
+    right: 14px; top: 14px;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 1px solid rgba(200,160,255,0.4);
+    background: rgba(80,40,160,0.4);
+    color: #c8a0ff;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .close-btn:hover { background: rgba(160,80,255,0.5); transform: scale(1.1); }
+
+  /* 世代选择 */
+  .gen-tabs {
+    display: flex;
+    gap: 0;
+    padding: 10px 14px 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .gen-tabs::-webkit-scrollbar { display: none; }
+  .gen-tab {
+    flex-shrink: 0;
+    padding: 5px 10px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    background: rgba(60,30,120,0.3);
+    border: 1px solid rgba(140,100,255,0.2);
+    border-bottom: none;
+    color: rgba(200,160,255,0.5);
+    transition: all 0.25s;
+    position: relative;
+    top: 1px;
+  }
+  .gen-tab:hover { color: rgba(200,160,255,0.85); background: rgba(80,40,150,0.4); }
+  .gen-tab.active {
+    background: rgba(80,40,180,0.55);
+    border-color: rgba(180,140,255,0.45);
+    color: #e0c8ff;
+    font-weight: bold;
+  }
+
+  /* 神兽列表区 */
+  .pokemon-panel {
+    padding: 12px 14px;
+    max-height: 370px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(140,100,255,0.4) transparent;
+    border-top: 1px solid rgba(140,100,255,0.25);
+  }
+
+  .pokemon-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(60,30,110,0.35);
+    border: 1px solid rgba(140,100,255,0.18);
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+    animation: cardIn 0.4s ease both;
+  }
+  @keyframes cardIn {
+    from { opacity:0; transform: translateX(-10px); }
+    to   { opacity:1; transform: translateX(0); }
+  }
+  .pokemon-card:hover {
+    background: rgba(100,50,200,0.45);
+    border-color: rgba(200,160,255,0.4);
+    transform: translateX(3px);
+    box-shadow: 0 0 20px rgba(140,80,255,0.2);
+  }
+  .pokemon-card.selected {
+    background: rgba(120,60,220,0.5);
+    border-color: rgba(220,180,255,0.6);
+    box-shadow: 0 0 25px rgba(160,100,255,0.35);
+  }
+  .pokemon-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .poke-sprite {
+    width: 52px; height: 52px;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 0 8px rgba(180,130,255,0.6));
+    flex-shrink: 0;
+    transition: transform 0.3s;
+  }
+  .pokemon-card:hover .poke-sprite { transform: scale(1.12) translateY(-2px); }
+  .pokemon-card.selected .poke-sprite {
+    animation: float 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 14px rgba(200,160,255,0.9));
+  }
+  @keyframes float {
+    0%,100%{ transform: translateY(0); }
+    50%{ transform: translateY(-4px); }
+  }
+
+  .poke-info { flex: 1; min-width: 0; }
+  .poke-name { font-size: 14px; font-weight: bold; color: #e8d8ff; letter-spacing: 1px; }
+  .poke-types { display: flex; gap: 4px; margin-top: 3px; }
+  .type-badge {
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    font-weight: bold;
+  }
+  .poke-desc { font-size: 10px; color: rgba(200,170,255,0.55); margin-top: 3px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .poke-price {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .price-val { font-size: 15px; font-weight: bold; color: #ffd700; letter-spacing: 1px; }
+  .price-unit { font-size: 9px; color: rgba(255,215,0,0.55); }
+
+  /* 底部购买区 */
+  .shop-footer {
+    padding: 12px 14px;
+    border-top: 1px solid rgba(140,100,255,0.2);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .selected-info { flex: 1; font-size: 11px; color: rgba(200,170,255,0.7); }
+  .selected-name { font-size: 13px; font-weight: bold; color: #e0c8ff; }
+
+  .qty-control { display: flex; align-items: center; gap: 6px; }
+  .qty-btn {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1px solid rgba(180,140,255,0.4);
+    background: rgba(80,40,160,0.5);
+    color: #c8a0ff;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    line-height: 1;
+  }
+  .qty-btn:hover { background: rgba(130,70,220,0.6); transform: scale(1.1); }
+  .qty-num { font-size: 13px; font-weight: bold; color: #e8d8ff; min-width: 16px; text-align: center; }
+
+  .buy-btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #7030c8, #a060ff);
+    color: #fff;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 4px 20px rgba(120,60,255,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+  .buy-btn::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .buy-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(140,80,255,0.55); }
+  .buy-btn:active { transform: translateY(0); }
+  .buy-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* 类型颜色 */
+  .t-psychic  { background:rgba(249,85,135,0.3);  color:#f9c8e0; border:1px solid rgba(249,85,135,0.4); }
+  .t-fire     { background:rgba(255,120,60,0.3);   color:#ffd0a0; border:1px solid rgba(255,120,60,0.4); }
+  .t-water    { background:rgba(80,160,255,0.3);   color:#b8d8ff; border:1px solid rgba(80,160,255,0.4); }
+  .t-electric { background:rgba(255,210,40,0.3);   color:#fff0a0; border:1px solid rgba(255,210,40,0.4); }
+  .t-ice      { background:rgba(100,210,255,0.3);  color:#c8f0ff; border:1px solid rgba(100,210,255,0.4); }
+  .t-dragon   { background:rgba(100,80,220,0.3);   color:#c8c0ff; border:1px solid rgba(100,80,220,0.4); }
+  .t-dark     { background:rgba(80,60,80,0.5);     color:#c0b0c0; border:1px solid rgba(140,100,140,0.4); }
+  .t-steel    { background:rgba(140,140,160,0.3);  color:#d8d8e8; border:1px solid rgba(160,160,180,0.4); }
+  .t-normal   { background:rgba(160,140,120,0.3);  color:#e0d8c8; border:1px solid rgba(160,140,120,0.4); }
+  .t-flying   { background:rgba(140,160,255,0.3);  color:#c8d0ff; border:1px solid rgba(140,160,255,0.4); }
+  .t-rock     { background:rgba(160,130,80,0.3);   color:#e0c890; border:1px solid rgba(160,130,80,0.4); }
+  .t-ground   { background:rgba(200,160,80,0.3);   color:#f0dca0; border:1px solid rgba(200,160,80,0.4); }
+  .t-ghost    { background:rgba(100,60,140,0.4);   color:#d0b8f0; border:1px solid rgba(120,80,180,0.4); }
+  .t-fairy    { background:rgba(255,160,200,0.3);  color:#ffe0f0; border:1px solid rgba(255,160,200,0.4); }
+  .t-grass    { background:rgba(80,180,80,0.3);    color:#b8f0b8; border:1px solid rgba(80,180,80,0.4); }
+  .t-fighting { background:rgba(200,60,60,0.3);    color:#f0c0c0; border:1px solid rgba(200,60,60,0.4); }
+  .t-poison   { background:rgba(160,60,160,0.3);   color:#f0b8f0; border:1px solid rgba(160,60,160,0.4); }
+
+  /* 购买动画 */
+  @keyframes buyFlash {
+    0%   { box-shadow: 0 0 0 rgba(160,100,255,0); }
+    50%  { box-shadow: 0 0 40px rgba(200,150,255,0.7); }
+    100% { box-shadow: 0 0 0 rgba(160,100,255,0); }
+  }
+  .buy-flash { animation: buyFlash 0.5s ease; }
+
+  /* 空状态 */
+  .empty-state { text-align:center; padding: 30px; color: rgba(180,150,255,0.4); font-size:13px; }
+
+  /* 粒子 */
+  .particle {
+    position: absolute;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: rgba(200,160,255,0.8);
+    pointer-events: none;
+    animation: particleUp 1.2s ease-out forwards;
+  }
+  @keyframes particleUp {
+    0%   { transform: translate(0,0) scale(1); opacity:1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity:0; }
+  }
+
+  .toast {
+    position: absolute;
+    bottom: 70px; left: 50%; transform: translateX(-50%);
+    background: rgba(80,200,120,0.9);
+    color: #fff;
+    font-size: 12px;
+    letter-spacing: 2px;
+    padding: 6px 18px;
+    border-radius: 20px;
+    pointer-events: none;
+    animation: toastAnim 1.8s ease forwards;
+    z-index: 99;
+  }
+  @keyframes toastAnim {
+    0%   { opacity:0; transform: translateX(-50%) translateY(6px); }
+    15%  { opacity:1; transform: translateX(-50%) translateY(0); }
+    80%  { opacity:1; }
+    100% { opacity:0; transform: translateX(-50%) translateY(-6px); }
+  }
+</style>
+</head>
+<script src="taichi://mod/taichicore/html/script/taichi.js"></script>
+<body>
+<div class="shop-container" id="shop">
+  <div class="shop-header">
+    <div class="shop-title">✦ LEGENDARY SHOP ✦</div>
+    <div class="shop-subtitle">神 兽 商 店</div>
+    <button class="close-btn" onclick="closeShop()">✕</button>
+  </div>
+
+  <!-- 世代 Tab -->
+  <div class="gen-tabs" id="genTabs"></div>
+
+  <!-- 神兽列表 -->
+  <div class="pokemon-panel" id="pokemonPanel"></div>
+
+  <!-- 底部 -->
+  <div class="shop-footer">
+    <div class="selected-info" id="selectedInfo">
+      <div style="color:rgba(200,160,255,0.45);font-size:11px;">请选择神兽</div>
+    </div>
+    <div class="qty-control">
+      <button class="qty-btn" onclick="changeQty(-1)">−</button>
+      <span class="qty-num" id="qtyNum">1</span>
+      <button class="qty-btn" onclick="changeQty(1)">+</button>
+    </div>
+    <button class="buy-btn" id="buyBtn" disabled onclick="buyPokemon()">购买</button>
+  </div>
+</div>
+
+<script>
+const GENS = [
+  { id: 1, label: '关都', name: '第一世代' },
+  { id: 2, label: '城都', name: '第二世代' },
+  { id: 3, label: '丰缘', name: '第三世代' },
+  { id: 4, label: '神奥', name: '第四世代' },
+  { id: 5, label: '合众', name: '第五世代' },
+  { id: 6, label: '卡洛斯', name: '第六世代' },
+  { id: 7, label: '阿罗拉', name: '第七世代' },
+  { id: 8, label: '伽勒尔', name: '第八世代' },
+  { id: 9, label: '帕底亚', name: '第九世代' },
+];
+
+const POKEMON = {
+  1: [
+    { id: 144, name: '急冻鸟', types: ['ice','flying'], price: 2800, desc: '冰之守护者，掌控极寒气候' },
+    { id: 145, name: '闪电鸟', types: ['electric','flying'], price: 2800, desc: '雷霆化身，翱翔于暴风之中' },
+    { id: 146, name: '火焰鸟', types: ['fire','flying'], price: 2800, desc: '不灭火焰，焚尽黑暗的圣鸟' },
+    { id: 150, name: '超梦',   types: ['psychic'],         price: 8800, desc: '最强基因宝可梦，人工创造的奇迹' },
+    { id: 151, name: '梦幻',   types: ['psychic'],         price: 9999, desc: '百年一遇的幻之宝可梦' },
+  ],
+  2: [
+    { id: 243, name: '雷公', types: ['electric'], price: 3200, desc: '疾如闪电，追逐暴风雨的狗' },
+    { id: 244, name: '炎帝', types: ['fire'],     price: 3200, desc: '烈焰神兽，传说仅留一根胡须' },
+    { id: 245, name: '水君', types: ['water'],    price: 3200, desc: '圣水之神，净化污浊之力' },
+    { id: 249, name: '洛奇亚', types: ['psychic','flying'], price: 6800, desc: '海之守护者，居于深海之中' },
+    { id: 250, name: '凤王',   types: ['fire','flying'],   price: 6800, desc: '传说中随凤凰涅槃而生' },
+    { id: 251, name: '时拉比', types: ['psychic','grass'], price: 9999, desc: '穿越时空的幻之宝可梦' },
+  ],
+  3: [
+    { id: 377, name: '雷吉洛克', types: ['rock'],   price: 2400, desc: '岩石巨人，由古代人类封印' },
+    { id: 378, name: '雷吉艾斯', types: ['ice'],    price: 2400, desc: '冰川巨人，沉眠于极地' },
+    { id: 379, name: '雷吉斯奇鲁', types: ['steel'], price: 2400, desc: '钢铁巨人，力量超乎想象' },
+    { id: 380, name: '拉帝亚斯', types: ['dragon','psychic'], price: 5500, desc: '温柔的龙族少女' },
+    { id: 381, name: '拉帝欧斯', types: ['dragon','psychic'], price: 5500, desc: '疾速的龙族少年' },
+    { id: 382, name: '盖欧卡', types: ['water'], price: 7800, desc: '大海的化身，呼风唤雨' },
+    { id: 383, name: '固拉多', types: ['ground','fire'], price: 7800, desc: '大地的创造者，掌控旱灾' },
+    { id: 384, name: '烈空座', types: ['dragon','flying'], price: 8500, desc: '划破天空的龙神' },
+    { id: 385, name: '基拉祈', types: ['steel','psychic'], price: 9999, desc: '许愿星，幻之宝可梦' },
+  ],
+  4: [
+    { id: 480, name: '吃力斯', types: ['psychic'], price: 3000, desc: '知识神兽，赋予人类智慧' },
+    { id: 481, name: '艾姆利多', types: ['psychic'], price: 3000, desc: '情感神兽，予以人类情感' },
+    { id: 482, name: '亚克诺姆', types: ['psychic'], price: 3000, desc: '意志神兽，注入人类斗志' },
+    { id: 483, name: '帝牙卢卡', types: ['dragon','steel'], price: 7500, desc: '时间的支配者' },
+    { id: 484, name: '帕路奇亚', types: ['dragon','water'], price: 7500, desc: '空间的统治者' },
+    { id: 487, name: '骑拉帝纳', types: ['dragon','ghost'], price: 8800, desc: '反面世界的君主' },
+    { id: 491, name: '达克莱伊', types: ['dark'], price: 9999, desc: '噩梦神兽，幻之宝可梦' },
+    { id: 492, name: '谢米', types: ['grass'], price: 9999, desc: '花之宝可梦，四季守护者' },
+  ],
+  5: [
+    { id: 638, name: '科巴鲁翁', types: ['steel','fighting'], price: 3200, desc: '正义神兽，钢铁之剑' },
+    { id: 639, name: '铁拳犬', types: ['rock','fighting'], price: 3200, desc: '岩石之剑，传说中的猛犬' },
+    { id: 640, name: '勾帕路翁', types: ['grass','fighting'], price: 3200, desc: '圣剑神兽，草之勇者' },
+    { id: 643, name: '雷希拉姆', types: ['dragon','fire'],  price: 8000, desc: '真理的化身，白色之龙' },
+    { id: 644, name: '捷克罗姆', types: ['dragon','electric'], price: 8000, desc: '理想的化身，黑色之龙' },
+    { id: 646, name: '酋雷姆',   types: ['dragon','ice'],    price: 8500, desc: '空虚之龙，融合的极限' },
+    { id: 647, name: '凯路迪欧', types: ['water','fighting'], price: 9999, desc: '圣剑士，幻之宝可梦' },
+  ],
+  6: [
+    { id: 716, name: '哲尔尼亚斯', types: ['fairy'], price: 8000, desc: '赋予生命之角，X之花鹿' },
+    { id: 717, name: '伊布尔',     types: ['dark','flying'], price: 8000, desc: '吞噬生命之翼，Y之蝙蝠' },
+    { id: 718, name: '基格尔德',  types: ['dragon','ground'], price: 8500, desc: '秩序之蛇，守护生态' },
+    { id: 719, name: '地狱犬',    types: ['rock','fairy'],   price: 9999, desc: '破坏神，幻之宝可梦' },
+    { id: 720, name: '胡帕',      types: ['psychic','ghost'], price: 9999, desc: '魔法戒环，幻之宝可梦' },
+  ],
+  7: [
+    { id: 785, name: '塔普·可可', types: ['electric','fairy'], price: 3500, desc: '关都地区守护神' },
+    { id: 786, name: '塔普·蕾蕾', types: ['psychic','fairy'],  price: 3500, desc: '阿卡拉地区守护神' },
+    { id: 787, name: '塔普·布路',  types: ['water','fairy'],   price: 3500, desc: '乌拉乌拉地区守护神' },
+    { id: 788, name: '塔普·奇奇', types: ['grass','fairy'],    price: 3500, desc: '波尼地区守护神' },
+    { id: 791, name: '索尔迦雷欧', types: ['psychic','steel'],  price: 7800, desc: '太阳神兽，银翼之狮' },
+    { id: 792, name: '路奈雅拉',  types: ['psychic','fairy'],   price: 7800, desc: '月亮神兽，迷雾蝙蝠' },
+    { id: 800, name: '奈克洛兹马', types: ['psychic'],          price: 9200, desc: '夺取之光，棱镜之兽' },
+    { id: 801, name: '玛机雅娜', types: ['steel','fairy'],      price: 9999, desc: '钢铁仙女，幻之宝可梦' },
+  ],
+  8: [
+    { id: 888, name: '扎希安',   types: ['fairy','steel'],   price: 7500, desc: '英雄之剑，蒙面的王者' },
+    { id: 889, name: '扎马赞达', types: ['fighting','steel'], price: 7500, desc: '武斗之盾，蒙面的王者' },
+    { id: 890, name: '无极汰那', types: ['poison','dragon'],  price: 9000, desc: '毒害的源头，无尽蔓延' },
+    { id: 891, name: '武道熊师', types: ['fighting'],         price: 9999, desc: '拳法传人，幻之宝可梦' },
+    { id: 896, name: '冰骑士',  types: ['ice','fighting'],   price: 4800, desc: '冰之甲骑，皇冠冻原守护者' },
+    { id: 897, name: '幽灵骑士', types: ['ghost','dragon'],   price: 4800, desc: '幽灵骑士，皇冠冻原的幽影' },
+    { id: 898, name: '雪国卡璞', types: ['psychic','ice'],    price: 9999, desc: '白原君主，幻之宝可梦' },
+  ],
+  9: [
+    { id: 1001, name: '筋道大师',   types: ['fighting','poison'], price: 4000, desc: '筋道之神，帕底亚守护者' },
+    { id: 1007, name: '铁荆棘',     types: ['fairy','steel'],     price: 4500, desc: '未来的仙子·钢铁版本' },
+    { id: 1008, name: '铁叶球',     types: ['grass','steel'],     price: 4500, desc: '未来的刺球·钢铁版本' },
+    { id: 1009, name: '克雷色利亚', types: ['psychic'],            price: 5500, desc: '月亮神兽，带来美梦' },
+    { id: 1017, name: '欧格彭',     types: ['grass','fire'],      price: 9999, desc: '面具的精灵，幻之宝可梦' },
+    { id: 1024, name: '盖欧卡·帕底亚', types: ['water','ground'], price: 9999, desc: '帕底亚守护神，大地统治者' },
+  ],
+};
+
+// 用PokeAPI sprites (官方后向精灵图)
+function spriteUrl(id) {
+  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+}
+
+let currentGen = 1;
+let selectedPokemon = null;
+let quantity = 1;
+
+function renderGenTabs() {
+  const el = document.getElementById('genTabs');
+  el.innerHTML = GENS.map(g => `
+    <div class="gen-tab ${g.id === currentGen ? 'active' : ''}" onclick="selectGen(${g.id})">${g.label}</div>
+  `).join('');
+}
+
+function renderPokemon() {
+  const panel = document.getElementById('pokemonPanel');
+  const list = POKEMON[currentGen] || [];
+  if (!list.length) {
+    panel.innerHTML = '<div class="empty-state">本世代暂无神兽</div>';
+    return;
+  }
+  panel.innerHTML = list.map((p, i) => `
+    <div class="pokemon-card ${selectedPokemon && selectedPokemon.id === p.id ? 'selected' : ''}"
+         onclick="selectPokemon(${i})"
+         style="animation-delay:${i * 0.05}s">
+      <img class="poke-sprite" src="${spriteUrl(p.id)}" alt="${p.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2252%22 height=%2252%22><text y=%2238%22 font-size=%2240%22>✨</text></svg>'">
+      <div class="poke-info">
+        <div class="poke-name">No.${p.id} ${p.name}</div>
+        <div class="poke-types">${p.types.map(t => `<span class="type-badge t-${t}">${typeName(t)}</span>`).join('')}</div>
+        <div class="poke-desc">${p.desc}</div>
+      </div>
+      <div class="poke-price">
+        <div class="price-val">♦ ${p.price.toLocaleString()}</div>
+        <div class="price-unit">神兽币</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function typeName(t) {
+  const map = {
+    psychic:'超能',fire:'火',water:'水',electric:'电',ice:'冰',
+    dragon:'龙',dark:'恶',steel:'钢',normal:'一般',flying:'飞行',
+    rock:'岩石',ground:'地面',ghost:'幽灵',fairy:'妖精',
+    grass:'草',fighting:'格斗',poison:'毒'
+  };
+  return map[t] || t;
+}
+
+function selectGen(id) {
+  currentGen = id;
+  selectedPokemon = null;
+  quantity = 1;
+  updateFooter();
+  renderGenTabs();
+  renderPokemon();
+}
+
+function selectPokemon(idx) {
+  const list = POKEMON[currentGen] || [];
+  selectedPokemon = list[idx];
+  quantity = 1;
+  updateFooter();
+  renderPokemon();
+}
+
+function changeQty(delta) {
+  quantity = Math.max(1, Math.min(99, quantity + delta));
+  document.getElementById('qtyNum').textContent = quantity;
+  updateFooter();
+}
+
+function updateFooter() {
+  const info = document.getElementById('selectedInfo');
+  const btn = document.getElementById('buyBtn');
+  document.getElementById('qtyNum').textContent = quantity;
+  if (selectedPokemon) {
+    const total = selectedPokemon.price * quantity;
+    info.innerHTML = `
+      <div class="selected-name">${selectedPokemon.name}</div>
+      <div style="color:rgba(255,215,0,0.75);font-size:11px;">合计 ♦ ${total.toLocaleString()} 神兽币</div>
+    `;
+    btn.disabled = false;
+  } else {
+    info.innerHTML = `<div style="color:rgba(200,160,255,0.4);font-size:11px;">请选择神兽</div>`;
+    btn.disabled = true;
+  }
+}
+
+function buyPokemon() {
+  if (!selectedPokemon) return;
+  const shop = document.getElementById('shop');
+  shop.classList.add('buy-flash');
+  setTimeout(() => shop.classList.remove('buy-flash'), 500);
+
+  // 粒子爆炸
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const angle = (Math.PI * 2 / 12) * i;
+    const dist = 40 + Math.random() * 30;
+    p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+    p.style.left = '50%'; p.style.bottom = '40px';
+    p.style.background = `hsl(${260 + Math.random()*60}, 80%, 75%)`;
+    p.style.animationDelay = Math.random() * 0.2 + 's';
+    shop.appendChild(p);
+    setTimeout(() => p.remove(), 1400);
+  }
+
+  // Toast
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = `✦ 成功购买 ${selectedPokemon.name} ×${quantity} ✦`;
+  shop.appendChild(toast);
+  setTimeout(() => toast.remove(), 1900);
+
+  // 回调给MC
+  taichi({
+    action: "customPacket",
+    identifier: 'buyPokemon',
+    data: JSON.stringify({
+        id: selectedPokemon.id,
+        name: selectedPokemon.name,
+        quantity: quantity,
+        totalPrice: selectedPokemon.price * quantity
+    })
+  });
+}
+
+function closeShop() {
+  const shop = document.getElementById('shop');
+  shop.style.transition = 'opacity 0.3s, transform 0.3s';
+  shop.style.opacity = '0';
+  shop.style.transform = 'scale(0.95) translateY(-8px)';
+  setTimeout(() => {
+    taichi({
+        action: "close"
+    });
+  }, 320);
+}
+
+// 初始化
+renderGenTabs();
+renderPokemon();
+updateFooter();
+</script>
+</body>
+</html>
