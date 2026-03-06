@@ -59,6 +59,8 @@ public class TaiChiCefUtil {
         }));
 
         //TODO
+        val gamePath = Minecraft.getInstance().gameDirectory.toPath();
+        val dataPath = gamePath.resolve("mods").resolve("taichi-data").normalize();
         val folderPath = "C:\\Users\\COLORFUL\\Downloads\\windows-amd64\\bin\\lib";
         val separator = File.separator;
         val libPath = folderPath + separator + getOSLibName();
@@ -95,6 +97,10 @@ public class TaiChiCefUtil {
         };
 
         val settings = new CefSettings();
+
+        val rootCachePath = dataPath.resolve("root-cache");
+        settings.root_cache_path = rootCachePath.toString();
+        settings.cache_path = rootCachePath.resolve("cache").toString();
 
         CefApp.addAppHandler(new CefAppHandlerAdapter(null) {
             @Override
