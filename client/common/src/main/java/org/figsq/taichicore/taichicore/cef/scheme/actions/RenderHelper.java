@@ -4,17 +4,16 @@ import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
+import com.mojang.blaze3d.vertex.VertexSorting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.CompletableFuture;
@@ -22,42 +21,6 @@ import java.util.concurrent.CompletableFuture;
 import static org.lwjgl.opengl.GL11.*;
 
 public final class RenderHelper {
-
-    private RenderHelper() {
-    }
-
-    // ── 公用：创建FBO ────────────────────────────────────────────────────────
-    private static RenderTarget createFbo(int width, int height) {
-        RenderTarget fbo = new TextureTarget(width, height, true, Minecraft.ON_OSX);
-        fbo.setClearColor(0f, 0f, 0f, 0f);
-        fbo.clear(Minecraft.ON_OSX);
-        fbo.bindWrite(true);
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.enableDepthTest();
-        Matrix4f projection = new Matrix4f().ortho(
-                -width / 2f, width / 2f,
-                -height / 2f, height / 2f,
-                -1000f, 1000f
-        );
-        RenderSystem.setProjectionMatrix(projection, com.mojang.blaze3d.vertex.VertexSorting.ORTHOGRAPHIC_Z);
-        return fbo;
-    }
-
-    // ── 公用：读取像素 ────────────────────────────────────────────────────────
-    private static ByteBuffer readPixels(RenderTarget fbo, int width, int height) {
-        RenderSystem.disableBlend();
-        RenderSystem.disableDepthTest();
-        ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(width * height * 4);
-        glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixelBuffer);
-        fbo.unbindWrite();
-        Minecraft.getInstance().getMainRenderTarget().bindWrite(true);
-        fbo.destroyBuffers();
-        flipVertically(pixelBuffer, width, height);
-        return pixelBuffer;
-    }
-
-    // ── 公用：垂直翻转 ────────────────────────────────────────────────────────
     private static void flipVertically(ByteBuffer buffer, int width, int height) {
         int rowBytes = width * 4;
         byte[] top = new byte[rowBytes];
@@ -77,7 +40,6 @@ public final class RenderHelper {
         buffer.rewind();
     }
 
-    // ── 公用：编码PNG ────────────────────────────────────────────────────────
     private static byte[] encodePng(ByteBuffer buffer, int width, int height) {
         com.mojang.blaze3d.platform.NativeImage image =
                 new com.mojang.blaze3d.platform.NativeImage(
@@ -105,7 +67,6 @@ public final class RenderHelper {
         }
     }
 
-    // ── 公用：确保在渲染线程执行 ─────────────────────────────────────────────
     private static byte[] ensureRenderThread(java.util.function.Supplier<byte[]> task) {
         Minecraft mc = Minecraft.getInstance();
         if (!mc.isSameThread() && !RenderSystem.isOnRenderThread()) {
@@ -114,76 +75,108 @@ public final class RenderHelper {
         return task.get();
     }
 
-    // ── 渲染玩家 ─────────────────────────────────────────────────────────────
     public static byte[] renderPlayerToPng(int width, int height, float entitySize) {
-        return renderPlayerToPng(width, height, entitySize, 0f, 0f, 0f);
+        return ensureRenderThread(() -> doRenderPlayer(width, height, entitySize));
     }
 
-    public static byte[] renderPlayerToPng(int width, int height, float entitySize,
-                                           float rotX, float rotY, float rotZ) {
-        return ensureRenderThread(() -> doRenderPlayer(width, height, entitySize, rotX, rotY, rotZ));
-    }
-
-    private static byte[] doRenderPlayer(int width, int height, float entitySize,
-                                         float rotX, float rotY, float rotZ) {
+    private static byte[] doRenderPlayer(int width, int height, float entitySize) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (player == null) return new byte[0];
 
-        float savedYRot = player.getYRot();
-        float savedYRotO = player.yRotO;
-        float savedXRot = player.getXRot();
-        float savedXRotO = player.xRotO;
-        float savedYHeadRot = player.getYHeadRot();
-        float savedYHeadRotO = player.yHeadRotO;
-        float savedYBodyRot = player.yBodyRot;
-        float savedYBodyRotO = player.yBodyRotO;
+        // 获取鼠标坐标
+        double winScale = mc.getWindow().getGuiScale();
+        float mouseX = (float) (mc.mouseHandler.xpos() / winScale);
+        float mouseY = (float) (mc.mouseHandler.ypos() / winScale);
 
-        player.setYRot(0f);
-        player.yRotO = 0f;
-        player.setXRot(0f);
-        player.xRotO = 0f;
-        player.setYHeadRot(0f);
-        player.yHeadRotO = 0f;
-        player.yBodyRot = 0f;
-        player.yBodyRotO = 0f;
+        // 屏幕尺寸
+        float screenW = mc.getWindow().getGuiScaledWidth();
+        float screenH = mc.getWindow().getGuiScaledHeight();
 
-        RenderTarget fbo = createFbo(width, height);
+        // 把鼠标坐标从屏幕空间映射到FBO空间
+        float fboMouseX = (mouseX / screenW) * width;
+        float fboMouseY = (mouseY / screenH) * height;
 
-        float baseScale = height * 0.5f * entitySize;
-        PoseStack poseStack = new PoseStack();
-        poseStack.translate(0, -height * 0.5f, -100f);
-        poseStack.scale(baseScale, baseScale, baseScale);
-        poseStack.mulPose(Axis.XP.rotationDegrees(5f + rotX));
-        poseStack.mulPose(Axis.YP.rotationDegrees(rotY));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(rotZ));
+        RenderTarget fbo = new TextureTarget(width, height, true, Minecraft.ON_OSX);
+        fbo.setClearColor(0f, 0f, 0f, 0f);
+        fbo.clear(Minecraft.ON_OSX);
+        fbo.bindWrite(true);
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.enableDepthTest();
+
+        Matrix4f projection = new Matrix4f().ortho(0, width, height, 0, -1000f, 1000f);
+        RenderSystem.setProjectionMatrix(projection, VertexSorting.ORTHOGRAPHIC_Z);
 
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
-        EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
-        boolean renderShadow = dispatcher.shouldRenderShadow;
-        dispatcher.setRenderShadow(false);
-        dispatcher.render(player, 0d, 0d, 0d, 0f, 1f, poseStack, bufferSource, LightTexture.FULL_BRIGHT);
+        GuiGraphics guiGraphics = new GuiGraphics(mc, bufferSource);
+
+        float centerX = width / 2f;
+        float centerY = height / 2f;
+        int scale = (int) (height * 0.5f * entitySize);
+
+        // 复刻 renderEntityInInventoryFollowsMouse 的鼠标计算逻辑
+        float p = (float) Math.atan((centerX - fboMouseX) / 40.0f);
+        float q = (float) Math.atan((centerY - fboMouseY) / 40.0f);
+
+        Quaternionf quaternionf  = new Quaternionf().rotateZ((float) Math.PI);
+        Quaternionf quaternionf2 = new Quaternionf().rotateX(q * 20.0f * (float)(Math.PI / 180f));
+        quaternionf.mul(quaternionf2);
+
+        // 保存并设置旋转字段
+        float savedYBodyRot  = player.yBodyRot;
+        float savedYRot      = player.getYRot();
+        float savedXRot      = player.getXRot();
+        float savedYHeadRot  = player.yHeadRot;
+        float savedYHeadRotO = player.yHeadRotO;
+
+        player.yBodyRot = 180f + p * 20f;
+        player.setYRot(  180f + p * 40f);
+        player.setXRot(       -q * 20f);
+        player.yHeadRot  = player.getYRot();
+        player.yHeadRotO = player.getYRot();
+
+        float w = player.getScale();
+        Vector3f offset = new Vector3f(0f, player.getBbHeight() / 2.0f * w, 0f);
+
+        // 直接调用不带scissor的版本
+        InventoryScreen.renderEntityInInventory(
+                guiGraphics,
+                centerX, centerY,
+                (float) scale / w,
+                offset,
+                quaternionf,
+                quaternionf2,
+                player
+        );
+
         bufferSource.endBatch();
-        dispatcher.setRenderShadow(renderShadow);
 
+        // 还原旋转字段
+        player.yBodyRot  = savedYBodyRot;
         player.setYRot(savedYRot);
-        player.yRotO = savedYRotO;
         player.setXRot(savedXRot);
-        player.xRotO = savedXRotO;
-        player.setYHeadRot(savedYHeadRot);
+        player.yHeadRot  = savedYHeadRot;
         player.yHeadRotO = savedYHeadRotO;
-        player.yBodyRot = savedYBodyRot;
-        player.yBodyRotO = savedYBodyRotO;
 
-        return encodePng(readPixels(fbo, width, height), width, height);
+        RenderSystem.disableBlend();
+        RenderSystem.disableDepthTest();
+
+        ByteBuffer pixelBuffer = ByteBuffer.allocateDirect(width * height * 4);
+        glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixelBuffer);
+
+        fbo.unbindWrite();
+        mc.getMainRenderTarget().bindWrite(true);
+        fbo.destroyBuffers();
+
+        flipVertically(pixelBuffer, width, height);
+        return encodePng(pixelBuffer, width, height);
     }
 
-    // ── 渲染物品 ─────────────────────────────────────────────────────────────
     public static byte[] renderItemToPng(ItemStack itemStack, int size) {
         return ensureRenderThread(() -> doRenderItem(itemStack, size));
     }
 
-    // 渲染背包指定格子
     public static byte[] renderInventorySlotToPng(int slot, int size) {
         return ensureRenderThread(() -> {
             Minecraft mc = Minecraft.getInstance();
@@ -197,27 +190,30 @@ public final class RenderHelper {
         Minecraft mc = Minecraft.getInstance();
         if (itemStack == null || itemStack.isEmpty()) return new byte[0];
 
-        RenderTarget fbo = createFbo(size, size);
+        final int GUI_SIZE = 16;
 
-        PoseStack poseStack = new PoseStack();
-        poseStack.scale(size, size, size);
+        RenderTarget fbo = new TextureTarget(size, size, true, Minecraft.ON_OSX);
+        fbo.setClearColor(0f, 0f, 0f, 0f);
+        fbo.clear(Minecraft.ON_OSX);
+        fbo.bindWrite(true);
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.enableDepthTest();
 
-        MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
+        Matrix4f projection = new Matrix4f().ortho(
+                0, GUI_SIZE,
+                GUI_SIZE, 0,
+                -1000f, 1000f
+        );
+        RenderSystem.setProjectionMatrix(projection, VertexSorting.ORTHOGRAPHIC_Z);
 
         Lighting.setupForFlatItems();
 
-        mc.getItemRenderer().renderStatic(
-                mc.player,
-                itemStack,
-                ItemDisplayContext.GUI,
-                false,
-                poseStack,
-                bufferSource,
-                mc.level,
-                LightTexture.FULL_BLOCK,
-                OverlayTexture.NO_OVERLAY,
-                0
-        );
+        MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
+        GuiGraphics guiGraphics = new GuiGraphics(mc, bufferSource);
+
+        guiGraphics.renderItem(itemStack, 0, 0);
+        guiGraphics.renderItemDecorations(mc.font, itemStack, 0, 0, null);
 
         bufferSource.endBatch();
 

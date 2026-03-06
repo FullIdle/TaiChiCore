@@ -16,17 +16,11 @@ public class RenderActionHandler implements ActionHandler {
             val width = request.getParam("width", "256");
             val height = request.getParam("height", "256");
             val scale = request.getParam("scale", "1.0");
-            val rotX = request.getParam("rotX", "0.0");
-            val rotY = request.getParam("rotY", "0.0");
-            val rotZ = request.getParam("rotZ", "0.0");
             return TaiChiResponse.binary(
                     RenderHelper.renderPlayerToPng(
                             Integer.parseInt(width),
                             Integer.parseInt(height),
-                            Float.parseFloat(scale),
-                            Float.parseFloat(rotX),
-                            Float.parseFloat(rotY),
-                            Float.parseFloat(rotZ)
+                            Float.parseFloat(scale)
                     ), type);
         }
         if (argument.equals("item")) {

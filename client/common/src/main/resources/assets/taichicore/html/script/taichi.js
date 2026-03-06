@@ -93,9 +93,6 @@ customElements.define("taichi-render", class extends HTMLElement {
                 params.width = width;
                 params.height = height;
                 params.scale = this.getAttribute("scale") || "1.0";
-                params.rotX = this.getAttribute("rotX") || "0.0";
-                params.rotY = this.getAttribute("rotY") || "0.0";
-                params.rotZ = this.getAttribute("rotZ") || "0.0";
                 break;
             }
             case "item": {

@@ -43,16 +43,10 @@ public class RenderNoticeHandler implements QueryHandler {
                             val width = Integer.parseInt(source.get("width").getAsString());
                             val height = Integer.parseInt(source.get("height").getAsString());
                             val scale = Float.parseFloat(source.get("scale").getAsString());
-                            val rotX = Float.parseFloat(source.get("rotX").getAsString());
-                            val rotY = Float.parseFloat(source.get("rotY").getAsString());
-                            val rotZ = Float.parseFloat(source.get("rotZ").getAsString());
                             return Base64.getEncoder().encodeToString(RenderHelper.renderPlayerToPng(
                                     width,
                                     height,
-                                    scale,
-                                    rotX,
-                                    rotY,
-                                    rotZ
+                                    scale
                             ));
                         };
                         case "item" -> (Supplier<String>) () ->
