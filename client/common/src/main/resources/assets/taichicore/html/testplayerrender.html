@@ -28,34 +28,60 @@
         background-color: rgba(0, 0, 0, 1);
     }
 
-    img {
-        height: 256px;
-        width: 256px;
+    .img-player {
+        height: 146px;
+        width: 146px;
     }
 
-    img:hover {
-        transform: scale(1.5); /*放大到1.5倍*/
+    .img-player:hover {
+        transform: scale(1.5);
     }
 
-    .test {
+    .img-item {
+        height: 64px;
+        width: 64px;
+    }
+
+    .img-item:hover {
+        transform: scale(1.5);
+    }
+
+    .player {
         width: 146px;
         height: 146px;
         display: inline-block;
+        border-radius: 10%;
+        border: 1px solid #000000;
+        background-color: red;
     }
 
-    /*对test也就是渲染玩家组件进行css处理*/
-    .test:hover {
+
+    .item {
+        width: 64px;
+        height: 64px;
+        display: inline-block;
+        border-radius: 10%;
+        border: 1px solid #000000;
+        background-color: red;
+    }
+
+    .player:hover {
+        transform: scale(1.5);
+    }
+
+    .item:hover {
         transform: scale(1.5);
     }
 </style>
 <!--导入taichi-->
-<script src="taichi://mod/taichicore/html/script/taichi.js"></script>
+<script src="D:\IdeaProjects\TaiChiCore\client\common\src\main\resources\assets\taichicore\html\script\taichi.js"></script>
 <body>
 <h1>你好,TaiChiCore</h1>
-<img src="taichi://render/player?width=256&height=256&scale=1.0&rotX=0.0&rotY=0.0&rotZ=0.0" alt="">
-<img src="taichi://render/item" alt="">
+<img class="img-player" src="taichi://render/player?width=146&height=146&scale=1.0&rotX=0.0&rotY=0.0&rotZ=0.0" alt="">
+<img class="img-item" src="taichi://render/item" alt="">
 <!--实时渲染玩家组件 画布-->
-<taichi-render class="test" type="player" width="146" height="146" rotX="0" rotY="0" rotZ="0"></taichi-render>
+<taichi-render class="player" type="player" width="146" height="146" rotX="0" rotY="0" rotZ="0"></taichi-render>
+<taichi-render class="item" type="item" width="64" height="64"></taichi-render>
 </body>
 <script>
 </script>

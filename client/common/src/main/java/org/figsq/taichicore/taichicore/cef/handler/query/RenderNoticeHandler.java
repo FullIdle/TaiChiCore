@@ -36,18 +36,37 @@ public class RenderNoticeHandler implements QueryHandler {
         if (source.get("isRegister").getAsBoolean()) {
             val type = source.get("type").getAsString().toLowerCase();
 
-            val width = Integer.parseInt(source.get("width").getAsString());
-            val height = Integer.parseInt(source.get("height").getAsString());
-            val scale = Float.parseFloat(source.get("scale").getAsString());
-            val rotX = Float.parseFloat(source.get("rotX").getAsString());
-            val rotY = Float.parseFloat(source.get("rotY").getAsString());
-            val rotZ = Float.parseFloat(source.get("rotZ").getAsString());
-
-            val context = switch (type) {
-                case "player" -> new NoticeContext(taiChiCefBrowser, queryId, () ->
-                        Base64.getEncoder().encodeToString(RenderHelper.renderPlayerToPng(width, height, scale, rotX, rotY, rotZ)));
-                default -> throw new RuntimeException("Unknown type!");
-            };
+            val context = new NoticeContext(taiChiCefBrowser, queryId,
+                    switch (type) {
+                        case "player" -> (Supplier<String>) () ->
+                        {
+                            val width = Integer.parseInt(source.get("width").getAsString());
+                            val height = Integer.parseInt(source.get("height").getAsString());
+                            val scale = Float.parseFloat(source.get("scale").getAsString());
+                            val rotX = Float.parseFloat(source.get("rotX").getAsString());
+                            val rotY = Float.parseFloat(source.get("rotY").getAsString());
+                            val rotZ = Float.parseFloat(source.get("rotZ").getAsString());
+                            return Base64.getEncoder().encodeToString(RenderHelper.renderPlayerToPng(
+                                    width,
+                                    height,
+                                    scale,
+                                    rotX,
+                                    rotY,
+                                    rotZ
+                            ));
+                        };
+                        case "item" -> (Supplier<String>) () ->
+                        {
+                            val slot = Integer.parseInt(source.get("slot").getAsString());
+                            val size = Integer.parseInt(source.get("size").getAsString());
+                            return Base64.getEncoder().encodeToString(RenderHelper.renderInventorySlotToPng(
+                                    slot,
+                                    size
+                            ));
+                        };
+                        default -> throw new RuntimeException("Unknown render notices type!");
+                    }
+            );
 
             taiChiCefBrowser.addRenderNotice(context);
             return String.valueOf(queryId);

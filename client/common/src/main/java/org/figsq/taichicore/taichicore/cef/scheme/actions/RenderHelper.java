@@ -2,6 +2,7 @@ package org.figsq.taichicore.taichicore.cef.scheme.actions;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -203,18 +204,24 @@ public final class RenderHelper {
 
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
 
+        Lighting.setupForFlatItems();
+
         mc.getItemRenderer().renderStatic(
+                mc.player,
                 itemStack,
                 ItemDisplayContext.GUI,
-                LightTexture.FULL_BRIGHT,
-                OverlayTexture.NO_OVERLAY,
+                false,
                 poseStack,
                 bufferSource,
                 mc.level,
+                LightTexture.FULL_BLOCK,
+                OverlayTexture.NO_OVERLAY,
                 0
         );
 
         bufferSource.endBatch();
+
+        Lighting.setupFor3DItems();
 
         RenderSystem.disableBlend();
         RenderSystem.disableDepthTest();
