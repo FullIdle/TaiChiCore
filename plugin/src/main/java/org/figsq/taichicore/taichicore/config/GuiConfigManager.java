@@ -12,7 +12,7 @@ import java.util.List;
 public class GuiConfigManager {
     public static File folder = new File(TaiChiCore.getInstance().getDataFolder(), "gui");
     public static List<GuiConfig> configs = new ArrayList<>();
-    public static void register() {
+    public static void load() {
         configs.clear();
         if (!folder.exists()) {
             folder.mkdirs();

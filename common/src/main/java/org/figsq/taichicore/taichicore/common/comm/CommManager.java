@@ -2,9 +2,7 @@ package org.figsq.taichicore.taichicore.common.comm;
 
 import com.google.common.io.ByteStreams;
 import lombok.val;
-import org.figsq.taichicore.taichicore.common.comm.packets.client.CleanUpGuiConfigPacket;
-import org.figsq.taichicore.taichicore.common.comm.packets.client.OpenUrlPacket;
-import org.figsq.taichicore.taichicore.common.comm.packets.client.UpdateGuiConfigPacket;
+import org.figsq.taichicore.taichicore.common.comm.packets.client.*;
 import org.figsq.taichicore.taichicore.common.comm.packets.common.CustomPacket;
 
 import java.lang.reflect.Constructor;
@@ -37,6 +35,8 @@ public abstract class CommManager<S> {
         registerPacket(CleanUpGuiConfigPacket.class);
         registerPacket(CustomPacket.class);
         registerPacket(OpenUrlPacket.class);
+        registerPacket(NavigatePacket.class);
+        registerPacket(OpenGuiConfigPacket.class);
     }
 
 

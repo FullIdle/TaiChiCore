@@ -7,10 +7,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.figsq.taichicore.taichicore.comm.PluginCommManager;
 import org.figsq.taichicore.taichicore.command.Commands;
 import org.figsq.taichicore.taichicore.config.GuiConfigManager;
+import org.openjdk.nashorn.api.scripting.NashornScriptEngine;
+import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
 public class TaiChiCore extends JavaPlugin {
     @Getter
     private static TaiChiCore instance;
+    @Getter
+    private static final NashornScriptEngine scriptEngine = (NashornScriptEngine) new NashornScriptEngineFactory().getScriptEngine(TaiChiCore.class.getClassLoader());
 
     public TaiChiCore() {
         instance = this;
@@ -28,7 +32,7 @@ public class TaiChiCore extends JavaPlugin {
     public void reloadConfig() {
         this.saveDefaultConfig();
         super.reloadConfig();
-        GuiConfigManager.register();
+        GuiConfigManager.load();
         for (Player player : Bukkit.getOnlinePlayers()) TaiChiCoreAPI.INSTANCE.updateGuiConfig(player);
     }
 }

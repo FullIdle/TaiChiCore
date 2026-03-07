@@ -57,6 +57,10 @@ public class GuiConfigPacketHandler {
         return resolveScreen(entry, guiConfig, null);
     }
 
+    public static GuiConfigScreen getGuiConfigScreen(String identifier) {
+        return getGuiConfigScreen(SCREEN_CACHE.get(identifier).getKey());
+    }
+
     /**
      * 判断是否需要给界面套浏览器界面
      *
