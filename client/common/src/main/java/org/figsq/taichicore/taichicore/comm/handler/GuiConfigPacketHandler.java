@@ -12,10 +12,10 @@ import org.figsq.taichicore.taichicore.screen.GuiConfigScreen;
 import org.jetbrains.annotations.Nullable;
 
 import javax.script.ScriptContext;
+import javax.script.ScriptException;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class GuiConfigPacketHandler {
     public static final IPacketHandler<UpdateGuiConfigPacket, Object> UPDATE = new IPacketHandler<>() {
@@ -99,15 +99,35 @@ public class GuiConfigPacketHandler {
 
 
     public static boolean match(GuiConfig guiConfig, String titleName, Object title) {
-        val rs = TaiChiCore.INSTANCE.evalScript(Objects.requireNonNull(guiConfig.matchScript, "GuiConfig#match(String titleName) match-script is null"), context -> {
-            if (title != null) context.setAttribute("title", title, ScriptContext.ENGINE_SCOPE);
-            if (titleName == null) throw new RuntimeException("GuiConfig#match(String titleName) titleName is null");
-            context.setAttribute("titleName", titleName, ScriptContext.ENGINE_SCOPE);
-        });
-        if (rs == null) throw new RuntimeException("GuiConfig#match(String titleName) script return null");
+        if (titleName == null) {
+            TaiChiCore.LOGGER.warn("GuiConfig#match titleName is null", new RuntimeException());
+            return false;
+        }
+        if (guiConfig.matchScript == null) {
+            TaiChiCore.LOGGER.warn("GuiConfig#match match-script is null", new RuntimeException());
+            return false;
+        }
+
+        Object rs;
+        try {
+            rs = TaiChiCore.INSTANCE.evalScript(guiConfig.matchScript, context -> {
+                if (title != null) context.setAttribute("title", title, ScriptContext.ENGINE_SCOPE);
+                context.setAttribute("titleName", titleName, ScriptContext.ENGINE_SCOPE);
+            });
+        } catch (ScriptException e) {
+            TaiChiCore.LOGGER.warn("GuiConfig#match script threw an exception", e);
+            return false;
+        }
+
+        if (rs == null) {
+            TaiChiCore.LOGGER.warn("GuiConfig#match script returned null", new RuntimeException());
+            return false;
+        }
         if (rs instanceof Boolean) return (Boolean) rs;
-        if (rs instanceof String) return rs.equals(titleName);
-        throw new RuntimeException("GuiConfig#match(String titleName) script return " + rs.getClass().getName());
+        if (rs instanceof String)  return rs.equals(titleName);
+
+        TaiChiCore.LOGGER.warn("GuiConfig#match script returned unexpected type: " + rs.getClass().getName(), new RuntimeException());
+        return false;
     }
 
     public static boolean match(GuiConfig guiConfig, String titleName) {

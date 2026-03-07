@@ -49,6 +49,7 @@
 # 接受的自定义数据包的标识符
 identifier: example
 handler: |
-  print(`玩家:${player.getName()} 发送了标识为 example, 数据为: ${data} 的数据包`)
-  tell(`你发送了标识为 example, 数据为: ${data} 的数据包`);
+  print('玩家:' + player.getName() + ' 发送了标识为 example, 数据为: ' + data + ' 的数据包');
+  tell('你发送了标识为 example, 数据为: ' + data + ' 的数据包');
   command('say hello world');
+  packet('example', '回包');

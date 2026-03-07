@@ -160,8 +160,8 @@ public class CustomPacketHandlerManager {
             );
             context.setAttribute(
                     "gui",
-                    (Consumer<String>) (url) ->
-                            PluginCommManager.INSTANCE.sendTo(player, new OpenGuiConfigPacket(url)),
+                    (Consumer<String>) (identifier) ->
+                            PluginCommManager.INSTANCE.sendTo(player, new OpenGuiConfigPacket(identifier)),
                     ScriptContext.ENGINE_SCOPE
             );
             context.setAttribute(

@@ -78,18 +78,14 @@ public abstract class TaiChiCore {
 
     public abstract ScriptEngine getScriptEngine();
 
-    public Object evalScript(String script) {
+    public Object evalScript(String script) throws ScriptException {
         return evalScript(script, null);
     }
 
-    public Object evalScript(String script, Consumer<ScriptContext> extras) {
+    public Object evalScript(String script, Consumer<ScriptContext> extras) throws ScriptException {
         val context = addTaiChiAttributes(new SimpleScriptContext());
         if (extras != null) extras.accept(context);
-        try {
-            return getScriptEngine().eval(script, context);
-        } catch (ScriptException e) {
-            throw new RuntimeException(e);
-        }
+        return getScriptEngine().eval(script, context);
     }
 
     /**

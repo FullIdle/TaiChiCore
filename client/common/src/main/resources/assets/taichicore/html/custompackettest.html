@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>TaiChiDemo</title>
+</head>
+<style>
+    * {
+        transition: all 1.0s;
+        user-select: none;
+    }
+
+    body {
+        text-align: center;
+        background-color: rgba(0, 0, 0, 0); /*底层背景颜色*/
+    }
+</style>
+<body>
+</body>
+<script src="D:\IdeaProjects\TaiChiCore\client\common\src\main\resources\assets\taichicore\html\script\taichi.js"></script>
+<script>
+    registerTaiChiCustomPacket('example', (data) => {
+        console.log('接受了服务端发来的example自定义数据包的数据>>' + data)
+    })
+    taichi({
+        action: 'customPacket',
+        identifier: 'example',
+        data: 'example'
+    })
+</script>
+</html>

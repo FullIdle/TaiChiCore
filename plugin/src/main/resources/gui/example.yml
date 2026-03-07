@@ -3,7 +3,8 @@ identifier: example
 # 这里写的是脚本，执行结果如果是字符串
 # 那么就会直接按照字符串的匹配方式来匹配屏幕名
 # 最终结果也可以是boolean
-match-script: 自定义GUI1
+# 可用变了 titleName 屏幕标题名 title 标题组件(Component对象)
+match-script: 'titleName.equals("example")'
 # {resource} 客户端侧资源包文件夹的绝对路径
 # url: file://{resource}/gui/example.html 客户端文件路径
 # url: taichi://mod/模组名/jar内资源文件路径 模组内路径 更多taichi://方案路径去看看这里把 TODO 哎嘿我没写呢~

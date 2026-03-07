@@ -8,6 +8,7 @@ import me.fullidle.ficore.ficore.common.api.commands.args.player.MultiplayerArgs
 import me.fullidle.ficore.ficore.common.api.commands.args.types.StringArgs;
 import org.bukkit.entity.Player;
 import org.figsq.taichicore.taichicore.comm.PluginCommManager;
+import org.figsq.taichicore.taichicore.common.comm.packets.client.OpenGuiConfigPacket;
 import org.figsq.taichicore.taichicore.common.comm.records.GuiConfig;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.OpenUrlPacket;
 import org.figsq.taichicore.taichicore.config.GuiConfigManager;
@@ -42,7 +43,7 @@ public class OpenCommand {
                     .exec(context -> {
                         val players = MultiplayerArgs.INSTANCE.get(context, "targets");
                         val config = CONFIG_ARGS.get(context, "gui");
-                        val packet = new OpenUrlPacket(config.url);
+                        val packet = new OpenGuiConfigPacket(config.identifier);
                         for (Player player : players) PluginCommManager.INSTANCE.sendTo(player, packet);
                     }))))
             .then(builder("url").then(args("targets", MultiplayerArgs.INSTANCE).then(args("url", STRING_ARGS)

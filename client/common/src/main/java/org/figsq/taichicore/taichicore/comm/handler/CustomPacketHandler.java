@@ -15,12 +15,11 @@ public class CustomPacketHandler implements IPacketHandler<CustomPacket, Object>
 
     @Override
     public void handle(CustomPacket packet, Object sender) {
-        val code = "window.taichiElements?.handlerTaiChiCustomPacket?.(\"" + packet.identifier + "\", \"" + packet.data + "\");";
+        val code = "handlerTaiChiCustomPacket(\"" + packet.identifier + "\", \"" + packet.data + "\");";
         val screen = Minecraft.getInstance().screen;
         if (screen instanceof TaiChiScreen) {
             val browser = ((TaiChiScreen) screen).getBrowser();
-            if (browser == null) return;
-            browser.executeJavaScript(code, "", 0);
+            if (browser != null) browser.executeJavaScript(code, "", 0);
         }
         //HUD
         val browser = TaiChiCore.HUD.getBrowser();

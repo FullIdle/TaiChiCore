@@ -83,11 +83,6 @@ public class TaiChiCefBrowser extends CefBrowserOsr {
     }
 
     @Override
-    public void setFocus(boolean enable) {
-        Minecraft.getInstance().execute(() -> super.setFocus(enable));
-    }
-
-    @Override
     public void onPaint(CefBrowser browser, boolean popup, Rectangle[] dirtyRects, ByteBuffer buffer, int width, int height) {
         // nothing to update
         if (dirtyRects.length == 0)
