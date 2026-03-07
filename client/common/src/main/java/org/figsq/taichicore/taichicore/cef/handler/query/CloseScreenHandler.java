@@ -15,7 +15,7 @@ public class CloseScreenHandler implements QueryHandler{
     public @Nullable String onQuery(CefBrowser browser, CefFrame frame, long queryId, JsonObject source, boolean persistent, CefQueryCallback callback) {
         val minecraft = Minecraft.getInstance();
         val screen = minecraft.screen;
-        if (screen != null) minecraft.setScreen(null);
+        if (screen != null) screen.onClose();
         return "ok";
     }
 }
