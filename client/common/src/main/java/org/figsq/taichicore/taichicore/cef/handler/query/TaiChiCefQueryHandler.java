@@ -42,9 +42,10 @@ public class TaiChiCefQueryHandler extends CefMessageRouterHandlerAdapter {
             } catch (Exception e) {
                 StringWriter sw = new StringWriter();
                 e.printStackTrace(new PrintWriter(sw));
-                val errorMessage = "Action '" + actionName + "' failed:\n" + sw;
+                val rawMsg = "Action '" + actionName + "' failed:";
+                val errorMessage = rawMsg + "\n" + sw;
                 callback.failure(-1, errorMessage);
-                TaiChiCore.LOGGER.error(errorMessage);
+                TaiChiCore.LOGGER.error(rawMsg, e);
             }
             return true;
         } catch (Exception ignored) {
