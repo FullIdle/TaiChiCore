@@ -1,5 +1,12 @@
 package org.figsq.taichicore.taichicore.command;
 
+import lombok.val;
+import me.fullidle.ficore.ficore.common.api.commands.args.player.MultiplayerArgs;
+import org.bukkit.entity.HumanEntity;
+import org.figsq.taichicore.taichicore.comm.PluginCommManager;
+import org.figsq.taichicore.taichicore.common.comm.packets.client.CloseHUDPacket;
+
+import static me.fullidle.ficore.ficore.common.api.commands.CommandBuilder.args;
 import static me.fullidle.ficore.ficore.common.api.commands.CommandBuilder.builder;
 
 public class Commands {
@@ -16,6 +23,16 @@ public class Commands {
                 .then(ReloadCommand.BUILDER)
                 .then(OpenCommand.BUILDER)
                 .then(DebugCommand.BUILDER)
+                .then(builder("close").then(args("targets", MultiplayerArgs.INSTANCE).exec(context -> {
+                    val players = MultiplayerArgs.INSTANCE.get(context, "targets");
+                    players.forEach(HumanEntity::closeInventory);
+                })))
+                .then(builder("closehud").then(args("targets", MultiplayerArgs.INSTANCE).exec(context -> {
+                    val players = MultiplayerArgs.INSTANCE.get(context, "targets");
+                    val instance = PluginCommManager.INSTANCE;
+                    val encode = instance.encode(new CloseHUDPacket());
+                    players.forEach(p-> instance.sendTo(p, encode));
+                })))
                 .registerPluginCommand();
     }
 

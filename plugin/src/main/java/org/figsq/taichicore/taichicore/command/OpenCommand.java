@@ -9,6 +9,7 @@ import me.fullidle.ficore.ficore.common.api.commands.args.types.StringArgs;
 import org.bukkit.entity.Player;
 import org.figsq.taichicore.taichicore.comm.PluginCommManager;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.OpenGuiConfigPacket;
+import org.figsq.taichicore.taichicore.common.comm.packets.client.SetHUDPacket;
 import org.figsq.taichicore.taichicore.common.comm.records.GuiConfig;
 import org.figsq.taichicore.taichicore.common.comm.packets.client.OpenUrlPacket;
 import org.figsq.taichicore.taichicore.config.GuiConfigManager;
@@ -52,6 +53,14 @@ public class OpenCommand {
                         val players = MultiplayerArgs.INSTANCE.get(context, "targets");
                         val url = STRING_ARGS.get(context, "url");
                         val packet = new OpenUrlPacket(url);
+                        for (Player player : players) PluginCommManager.INSTANCE.sendTo(player, packet);
+                    }))))
+            .then(builder("hud").then(args("targets", MultiplayerArgs.INSTANCE).then(args("url", STRING_ARGS)
+                    .permission(permission("open.path"))
+                    .exec(context -> {
+                        val players = MultiplayerArgs.INSTANCE.get(context, "targets");
+                        val url = STRING_ARGS.get(context, "url");
+                        val packet = new SetHUDPacket(url);
                         for (Player player : players) PluginCommManager.INSTANCE.sendTo(player, packet);
                     }))));
 }

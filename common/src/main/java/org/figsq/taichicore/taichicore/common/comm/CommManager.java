@@ -37,6 +37,8 @@ public abstract class CommManager<S> {
         registerPacket(OpenUrlPacket.class);
         registerPacket(NavigatePacket.class);
         registerPacket(OpenGuiConfigPacket.class);
+        registerPacket(CloseHUDPacket.class);
+        registerPacket(SetHUDPacket.class);
     }
 
 

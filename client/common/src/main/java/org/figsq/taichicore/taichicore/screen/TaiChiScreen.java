@@ -27,7 +27,7 @@ public class TaiChiScreen extends Screen {
 
     public TaiChiScreen(String url) {
         super(Component.literal("TaiChiScreen"));
-        this.url = url;
+        this.url = TaiChiCefBrowser.formatURL(url);
     }
 
     @Override

@@ -57,7 +57,7 @@ public class TaiChiCefBrowser extends CefBrowserOsr {
     ) {
         super(
                 client,
-                url,
+                formatURL(url),
                 transparent,
                 context,
                 parent,
@@ -72,7 +72,7 @@ public class TaiChiCefBrowser extends CefBrowserOsr {
 
     @Override
     public void loadURL(String url) {
-        super.loadURL(url);
+        super.loadURL(formatURL(url));
         this.clearRenderNotice();
     }
 
@@ -273,5 +273,12 @@ public class TaiChiCefBrowser extends CefBrowserOsr {
         synchronized (this.RENDER_NOTICE_CONTEXTS) {
             this.RENDER_NOTICE_CONTEXTS.clear();
         }
+    }
+
+    public static String formatURL(String url) {
+        return url.replace(
+                "{resource-pack-dir}",
+                Minecraft.getInstance().getResourcePackDirectory().toAbsolutePath().toString()
+        );
     }
 }

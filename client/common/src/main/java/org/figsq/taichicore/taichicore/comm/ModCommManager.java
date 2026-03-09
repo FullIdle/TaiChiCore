@@ -40,6 +40,7 @@ public class ModCommManager extends CommManager<Object> {
         registerHandler(CustomPacket.class, CustomPacketHandler.INSTANCE);
         registerHandler(NavigatePacket.class, NavigatePacketHandler.INSTANCE);
         registerHandler(OpenGuiConfigPacket.class, OpenGuiConfigPacketHandler.INSTANCE);
+        registerHandler(CloseHUDPacket.class, CloseHUDPacketHandler.INSTANCE);
     }
 
     @Override
