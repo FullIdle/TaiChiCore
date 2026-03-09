@@ -3,240 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft RPG HUD</title>
+    <title>TaiChiCore 侧边提示框</title>
     <style>
-        /* 全局样式重置和基础设置 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Minecraft', monospace;
         }
-
-        /* 模拟Minecraft字体（使用像素字体替代） */
-        @font-face {
-            font-family: 'Minecraft';
-            src: url('https://cdn.jsdelivr.net/gh/IdreesInc/Minecraft-Font@master/Minecraft.ttf') format('truetype');
-            fallback: monospace;
-        }
-
-        /* 关键修改：移除背景图片，设置全透明背景 */
         body {
-            background: transparent !important; /* 全透明背景 */
-            height: 100vh;
-            overflow: hidden;
-            color: #fff;
+            background: transparent;
+            min-height: 100vh;
+            font-family: "Microsoft Yahei", Arial, sans-serif;
         }
 
-        /* HUD容器 - 全屏覆盖 */
-        .hud-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            padding: 20px;
-            pointer-events: none; /* 不影响页面其他交互 */
-            background: transparent; /* 容器也设为透明 */
-        }
-
-        /* 通用进度条样式 */
-        .bar-container {
-            display: flex;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 4px;
-            border: 2px solid #000;
-            margin-bottom: 8px;
-        }
-
-        .bar-label {
-            margin-right: 8px;
-            font-size: 16px;
-            text-shadow: 2px 2px 0 #000;
-            min-width: 60px;
-        }
-
-        .bar-fill-area {
-            width: 200px;
-            height: 20px;
-            background: #333;
-            border: 2px solid #666;
-            overflow: hidden;
-        }
-
-        .bar-fill {
-            height: 100%;
-            transition: width 0.3s ease;
-        }
-
-        /* 血量条样式 */
-        .health-bar .bar-fill {
-            background: linear-gradient(90deg, #ff4444, #ff0000);
-            width: 85%; /* 8.5颗心 */
-        }
-
-        /* 饱食度条样式 */
-        .hunger-bar .bar-fill {
-            background: linear-gradient(90deg, #f1c40f, #f39c12);
-            width: 60%; /* 6格饱食度 */
-        }
-
-        /* 经验条样式 */
-        .xp-bar {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60%;
-            max-width: 800px;
-        }
-
-        .xp-bar .bar-fill-area {
-            width: 100%;
-        }
-
-        .xp-bar .bar-fill {
-            background: linear-gradient(90deg, #8e44ad, #9b59b6);
-            width: 45%; /* 45%经验 */
-        }
-
-        .xp-level {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 18px;
-            text-shadow: 2px 2px 0 #000;
-        }
-
-        /* RPG布局位置 */
-        .top-left {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-        }
-
-        .top-right {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-
-        /* 玩家信息 */
-        .player-info {
-            font-size: 20px;
-            text-shadow: 2px 2px 0 #000;
-            margin-bottom: 10px;
-            color: #ffff00;
-        }
-
-        /* 快捷栏（额外增强） */
-        .hotbar {
-            position: absolute;
-            bottom: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 8px;
-            border: 2px solid #000;
-        }
-
-        .hotbar-slot {
-            width: 40px;
-            height: 40px;
-            border: 2px solid #666;
-            background: rgba(100, 100, 100, 0.3);
-            margin: 0 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .hotbar-slot.active {
-            border-color: #ffff00;
-        }
-
-        /* 悬停提示 */
-        .bar-container:hover {
+        /* 核心：右侧居中半透明小黑框（修复position重复定义问题） */
+        .taichi-sidebar {
+            position: fixed; /* 仅保留fixed定位，确保基于视口定位 */
+            right: 20px; /* 距离屏幕右侧20px */
+            top: 50%; /* 顶部对齐视口50%位置 */
+            transform: translateY(-50%); /* 向上偏移自身50%高度，实现垂直居中 */
+            width: 280px;
             background: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            z-index: 999; /* 确保框体在最上层 */
         }
 
-        .bar-container:hover::after {
-            content: attr(data-value);
+        /* RGB 旋转灯效边框 */
+        .taichi-sidebar::before {
+            content: "";
             position: absolute;
-            top: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #000;
-            padding: 2px 8px;
-            border: 1px solid #666;
-            font-size: 14px;
-            white-space: nowrap;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(
+                45deg, 
+                #ff0000, #ff9900, #33ff00, 
+                #0099ff, #9900ff, #ff0000
+            );
+            border-radius: 10px;
+            z-index: -1;
+            animation: rotateLight 3s linear infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes rotateLight {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* 文字样式 */
+        .taichi-title {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        /* 图片容器 */
+        .taichi-img {
+            width: 100%;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .taichi-img img {
+            width: 100%;
+            display: block;
+            opacity: 0.9;
         }
     </style>
 </head>
 <body>
-<div class="hud-container">
-    <!-- 左上角 - 血量和玩家信息 (RPG经典位置) -->
-    <div class="top-left">
-        <div class="player-info">Steve Lv.25</div>
-        <div class="bar-container health-bar" data-value="17/20 生命值">
-            <div class="bar-label">生命</div>
-            <div class="bar-fill-area">
-                <div class="bar-fill"></div>
-            </div>
+    <div class="taichi-sidebar">
+        <div class="taichi-title">欢迎使用TaiChiCore</div>
+        <div class="taichi-img">
+            <img src="https://picsum.photos/id/1025/280/180" alt="TaiChiCore 自定义图">
         </div>
     </div>
-
-    <!-- 右上角 - 饱食度 (RPG经典位置) -->
-    <div class="top-right">
-        <div class="bar-container hunger-bar" data-value="12/20 饱食度">
-            <div class="bar-label">饱食</div>
-            <div class="bar-fill-area">
-                <div class="bar-fill"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 底部 - 经验条 (RPG经典位置) -->
-    <div class="bar-container xp-bar" data-value="45% 经验值">
-        <div class="bar-label">经验</div>
-        <div class="bar-fill-area">
-            <div class="bar-fill"></div>
-        </div>
-        <div class="xp-level">Lv.25</div>
-    </div>
-
-    <!-- 底部快捷栏 (增强体验) -->
-    <div class="hotbar">
-        <div class="hotbar-slot">🪓</div>
-        <div class="hotbar-slot active">⚔️</div>
-        <div class="hotbar-slot">🏹</div>
-        <div class="hotbar-slot">🍞</div>
-        <div class="hotbar-slot">🧪</div>
-        <div class="hotbar-slot">⛏️</div>
-        <div class="hotbar-slot">🛡️</div>
-        <div class="hotbar-slot">🧱</div>
-        <div class="hotbar-slot">🔥</div>
-    </div>
-</div>
-
-<script>
-    // 简单的交互效果：随机修改数值演示
-    setInterval(() => {
-        // 随机修改血量值 (10-20之间)
-        const healthPercent = Math.floor(Math.random() * 90) + 10;
-        document.querySelector('.health-bar .bar-fill').style.width = `${healthPercent}%`;
-        document.querySelector('.health-bar').setAttribute('data-value', `${Math.floor(healthPercent/5)}${healthPercent%5 >= 2.5 ? '.5' : ''}/20 生命值`);
-
-        // 随机修改饱食度值 (5-20之间)
-        const hungerPercent = Math.floor(Math.random() * 75) + 25;
-        document.querySelector('.hunger-bar .bar-fill').style.width = `${hungerPercent}%`;
-        document.querySelector('.hunger-bar').setAttribute('data-value', `${Math.floor(hungerPercent/5)}${hungerPercent%5 >= 2.5 ? '.5' : ''}/20 饱食度`);
-
-    }, 3000);
-
-    Java.type('java.lang.System').out.println('测试测试')
-</script>
 </body>
 </html>

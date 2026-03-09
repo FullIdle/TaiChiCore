@@ -52,24 +52,16 @@ public class TaiChiCefUtil {
     public static boolean init() {
         if (initialized) return true;
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            cefClient.dispose();
-            cefApp.dispose();
-            new HashSet<>(browserSet).forEach(b -> b.close(true));
-        }));
-
         //TODO
-        val gamePath = Minecraft.getInstance().gameDirectory.toPath();
+        val gamePath = Minecraft.getInstance().gameDirectory.toPath().toAbsolutePath();
         val dataPath = gamePath.resolve("mods").resolve("taichi-data").normalize();
-        val folderPath = "C:\\Users\\COLORFUL\\Downloads\\windows-amd64\\bin\\lib";
-        val separator = File.separator;
-        val libPath = folderPath + separator + getOSLibName();
+        val libPath = dataPath.resolve("library");
 
-        System.setProperty(LIB_PATH_KEY, libPath);
+        System.setProperty(LIB_PATH_KEY, libPath.toString());
 
         SystemBootstrap.setLoader(libname -> {
             try {
-                System.load(libPath + separator + libname + ".dll");
+                System.load(libPath.resolve(libname + ".dll").toString());
             } catch (UnsatisfiedLinkError e) {
                 System.loadLibrary(libname);
             }
@@ -136,6 +128,12 @@ public class TaiChiCefUtil {
 
         cefClient.addMessageRouter(TaiChiCefQueryHandler.ROUTER);
         cefClient.addDisplayHandler(TaiChiCefDisplayHandler.INSTANCE);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            cefClient.dispose();
+            cefApp.dispose();
+            new HashSet<>(browserSet).forEach(b -> b.close(true));
+        }));
 
         return initialized = true;
     }
