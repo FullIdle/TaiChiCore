@@ -32,8 +32,7 @@ public abstract class TaiChiCore {
                     })))
                     .then(literal("huburl").then(argument("huburl", StringArgumentType.greedyString()).executes(context -> {
                         val url = StringArgumentType.getString(context, "huburl");
-                        TaiChiCore.HUD.getBrowser().loadURL(url);
-                        TaiChiCore.renderHUD = true;
+                        TaiChiCore.hudLoadURL(url, true);
                         return 1;
                     })))
                     .then(literal("closehud").executes(context -> {
@@ -44,9 +43,27 @@ public abstract class TaiChiCore {
     public static final String MOD_ID = "taichicore";
     public static final String MOD_NAME = "TaiChiCore";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static final TaiChiScreen HUD = new TaiChiScreen("taichi://mod/taichicore/html/test.html");
-    public static boolean renderHUD = true;
+    public static final TaiChiScreen HUD = new TaiChiScreen("about:blank");
+    public static boolean renderHUD = false;
     public static boolean isAltHeld = false;
+
+    public static void hudLoadURL(String url, boolean render) {
+        val browser = TaiChiCore.HUD.getBrowser();
+        if (browser != null) browser.loadURL(url);
+        else TaiChiCore.HUD.setUrl(url);
+        TaiChiCore.renderHUD = render;
+    }
+
+    public static void renderHUD(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+        if (!renderHUD) return;
+        val minecraft = Minecraft.getInstance();
+        val newWidth = minecraft.getWindow().getGuiScaledWidth();
+        val newHeight = minecraft.getWindow().getGuiScaledHeight();
+        if (HUD.width != newWidth || HUD.height != newHeight)
+            if (HUD.getBrowser() == null) HUD.init(minecraft, newWidth, newHeight);
+            else HUD.resize(minecraft, newWidth, newHeight);
+        HUD.render(guiGraphics, HUD.width / 2, HUD.height / 2, deltaTracker.getGameTimeDeltaPartialTick(true));
+    }
 
     public TaiChiCore() {
         INSTANCE = this;
@@ -59,17 +76,6 @@ public abstract class TaiChiCore {
     public void initComm() {
         ModCommManager.INSTANCE.init();
         initPlatformComm();
-    }
-
-    public void renderHUD(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        if (!renderHUD) return;
-        val minecraft = Minecraft.getInstance();
-        val newWidth = minecraft.getWindow().getGuiScaledWidth();
-        val newHeight = minecraft.getWindow().getGuiScaledHeight();
-        if (HUD.width != newWidth || HUD.height != newHeight)
-            if (HUD.getBrowser() == null) HUD.init(minecraft, newWidth, newHeight);
-            else HUD.resize(minecraft, newWidth, newHeight);
-        HUD.render(guiGraphics, HUD.width / 2, HUD.height / 2, deltaTracker.getGameTimeDeltaPartialTick(true));
     }
 
     public abstract void initPlatformComm();

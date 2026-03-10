@@ -3,6 +3,7 @@ package org.figsq.taichicore.taichicore.screen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.val;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -22,7 +23,8 @@ import java.awt.event.MouseWheelEvent;
 public class TaiChiScreen extends Screen {
     @Getter
     private TaiChiCefBrowser browser;
-    private final String url;
+    @Setter //setter仅在未初始化前，有用
+    private String url;
     private int btnMask = 0;
 
     public TaiChiScreen(String url) {

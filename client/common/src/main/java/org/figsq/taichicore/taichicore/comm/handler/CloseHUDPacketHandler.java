@@ -11,10 +11,6 @@ public class CloseHUDPacketHandler implements IPacketHandler<CloseHUDPacket, Obj
 
     @Override
     public void handle(CloseHUDPacket packet, Object sender) {
-        Minecraft.getInstance().execute(()-> {
-            TaiChiCore.renderHUD = false;
-            val browser = TaiChiCore.HUD.getBrowser();
-            if (browser != null) browser.loadURL("about:blank");
-        });
+        Minecraft.getInstance().execute(()-> TaiChiCore.hudLoadURL("about:blank", false));
     }
 }

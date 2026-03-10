@@ -109,5 +109,11 @@ public class TaiChiCefQueryHandler extends CefMessageRouterHandlerAdapter {
                 "关闭屏幕",
                 "关闭界面"
         );
+        register(SendCommandHandler.INSTANCE,
+                "sendCommand",
+                "发送命令",
+                "command",
+                "命令"
+        );
     }
 }
