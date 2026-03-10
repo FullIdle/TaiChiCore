@@ -17,17 +17,18 @@ public class RenderActionHandler implements ActionHandler {
             val height = request.getParam("height", "256");
             val scale = request.getParam("scale", "1.0");
             return TaiChiResponse.binary(
-                    RenderHelper.renderPlayerToPng(
+                    RenderHelper.renderPlayer(
                             Integer.parseInt(width),
                             Integer.parseInt(height),
-                            Float.parseFloat(scale)
+                            Float.parseFloat(scale),
+                            true
                     ), type);
         }
         if (argument.equals("item")) {
             val slot = request.getParam("slot", "0");
             val size = request.getParam("size", "64");
             return TaiChiResponse.binary(
-                    RenderHelper.renderInventorySlotToPng(Integer.parseInt(slot), Integer.parseInt(size)), type);
+                    RenderHelper.renderInventorySlot(Integer.parseInt(slot), Integer.parseInt(size), true), type);
         }
         return TaiChiResponse.noContent();
     }

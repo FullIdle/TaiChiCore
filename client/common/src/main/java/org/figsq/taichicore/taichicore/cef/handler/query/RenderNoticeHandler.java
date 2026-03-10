@@ -43,19 +43,21 @@ public class RenderNoticeHandler implements QueryHandler {
                             val width = Integer.parseInt(source.get("width").getAsString());
                             val height = Integer.parseInt(source.get("height").getAsString());
                             val scale = Float.parseFloat(source.get("scale").getAsString());
-                            return Base64.getEncoder().encodeToString(RenderHelper.renderPlayerToPng(
+                            return Base64.getEncoder().encodeToString(RenderHelper.renderPlayer(
                                     width,
                                     height,
-                                    scale
+                                    scale,
+                                    false
                             ));
                         };
                         case "item" -> (Supplier<String>) () ->
                         {
                             val slot = Integer.parseInt(source.get("slot").getAsString());
                             val size = Integer.parseInt(source.get("size").getAsString());
-                            return Base64.getEncoder().encodeToString(RenderHelper.renderInventorySlotToPng(
+                            return Base64.getEncoder().encodeToString(RenderHelper.renderInventorySlot(
                                     slot,
-                                    size
+                                    size,
+                                    false
                             ));
                         };
                         default -> throw new RuntimeException("Unknown render notices type!");

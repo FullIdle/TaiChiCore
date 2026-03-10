@@ -3,8 +3,10 @@ package org.figsq.taichicore.taichicore.cef.scheme.actions;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexSorting;
+import lombok.val;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -40,31 +42,34 @@ public final class RenderHelper {
         buffer.rewind();
     }
 
-    private static byte[] encodePng(ByteBuffer buffer, int width, int height) {
-        com.mojang.blaze3d.platform.NativeImage image =
-                new com.mojang.blaze3d.platform.NativeImage(
-                        com.mojang.blaze3d.platform.NativeImage.Format.RGBA,
-                        width, height, false
-                );
-        byte[] raw = new byte[width * height * 4];
-        buffer.get(raw);
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int i = (y * width + x) * 4;
-                int r = raw[i] & 0xFF;
-                int g = raw[i + 1] & 0xFF;
-                int b = raw[i + 2] & 0xFF;
-                int a = raw[i + 3] & 0xFF;
-                image.setPixelRGBA(x, y, (a << 24) | (b << 16) | (g << 8) | r);
+    private static byte[] encode(ByteBuffer buffer, int width, int height, boolean png) {
+        if (png) {
+            NativeImage image = new NativeImage(NativeImage.Format.RGBA, width, height, false);
+            byte[] raw = new byte[width * height * 4];
+            buffer.get(raw);
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int i = (y * width + x) * 4;
+                    int r = raw[i] & 0xFF;
+                    int g = raw[i + 1] & 0xFF;
+                    int b = raw[i + 2] & 0xFF;
+                    int a = raw[i + 3] & 0xFF;
+                    image.setPixelRGBA(x, y, (a << 24) | (b << 16) | (g << 8) | r);
+                }
+            }
+            try {
+                return image.asByteArray();
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to encode PNG", e);
+            } finally {
+                image.close();
             }
         }
-        try {
-            return image.asByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to encode PNG", e);
-        } finally {
-            image.close();
-        }
+
+
+        val bytes = new byte[buffer.capacity()];
+        buffer.get(bytes);
+        return bytes;
     }
 
     private static byte[] ensureRenderThread(java.util.function.Supplier<byte[]> task) {
@@ -75,11 +80,11 @@ public final class RenderHelper {
         return task.get();
     }
 
-    public static byte[] renderPlayerToPng(int width, int height, float entitySize) {
-        return ensureRenderThread(() -> doRenderPlayer(width, height, entitySize));
+    public static byte[] renderPlayer(int width, int height, float entitySize, boolean png) {
+        return ensureRenderThread(() -> doRenderPlayer(width, height, entitySize, png));
     }
 
-    private static byte[] doRenderPlayer(int width, int height, float entitySize) {
+    private static byte[] doRenderPlayer(int width, int height, float entitySize, boolean png) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (player == null) return new byte[0];
@@ -170,23 +175,23 @@ public final class RenderHelper {
         fbo.destroyBuffers();
 
         flipVertically(pixelBuffer, width, height);
-        return encodePng(pixelBuffer, width, height);
+        return encode(pixelBuffer, width, height, png);
     }
 
-    public static byte[] renderItemToPng(ItemStack itemStack, int size) {
-        return ensureRenderThread(() -> doRenderItem(itemStack, size));
+    public static byte[] renderItem(ItemStack itemStack, int size, boolean png) {
+        return ensureRenderThread(() -> doRenderItem(itemStack, size, png));
     }
 
-    public static byte[] renderInventorySlotToPng(int slot, int size) {
+    public static byte[] renderInventorySlot(int slot, int size, boolean png) {
         return ensureRenderThread(() -> {
             Minecraft mc = Minecraft.getInstance();
             if (mc.player == null) return new byte[0];
             ItemStack stack = mc.player.getInventory().getItem(slot);
-            return doRenderItem(stack, size);
+            return doRenderItem(stack, size, png);
         });
     }
 
-    private static byte[] doRenderItem(ItemStack itemStack, int size) {
+    private static byte[] doRenderItem(ItemStack itemStack, int size, boolean png) {
         Minecraft mc = Minecraft.getInstance();
         if (itemStack == null || itemStack.isEmpty()) return new byte[0];
 
@@ -230,6 +235,6 @@ public final class RenderHelper {
         fbo.destroyBuffers();
 
         flipVertically(pixelBuffer, size, size);
-        return encodePng(pixelBuffer, size, size);
+        return encode(pixelBuffer, size, size, png);
     }
 }

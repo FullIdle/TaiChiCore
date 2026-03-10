@@ -137,15 +137,17 @@ customElements.define("taichi-render", class extends HTMLElement {
 
     update(base64) {
         if (!this._ctx) return;
-        const img = new Image();
         if (!base64) {
-            this._ctx.clearRect(0, 0, this._ctx.canvas.width, this._ctx.canvas.height);
+            this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
             return;
         }
-        img.onload = () => {
-            this._ctx.clearRect(0, 0, this._ctx.canvas.width, this._ctx.canvas.height);
-            this._ctx.drawImage(img, 0, 0);
-        };
-        img.src = "data:image/png;base64," + base64;
+
+        const binary = atob(base64);
+        const bytes  = new Uint8ClampedArray(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+
+        this._ctx.putImageData(new ImageData(bytes, this._canvas.width, this._canvas.height), 0, 0);
     }
 });
