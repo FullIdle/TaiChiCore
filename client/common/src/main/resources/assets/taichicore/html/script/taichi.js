@@ -102,6 +102,7 @@ customElements.define("taichi-render", class extends HTMLElement {
                 params.width = width;
                 params.height = height;
                 params.scale = this.getAttribute("scale") || "1.0";
+                params.follow_mouse = this.getAttribute("follow_mouse") || "false";
                 break;
             }
             case "item": {

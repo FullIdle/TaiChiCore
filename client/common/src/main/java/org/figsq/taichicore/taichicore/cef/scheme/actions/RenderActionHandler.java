@@ -16,12 +16,14 @@ public class RenderActionHandler implements ActionHandler {
             val width = request.getParam("width", "256");
             val height = request.getParam("height", "256");
             val scale = request.getParam("scale", "1.0");
+            val followMouse = request.getParam("follow_mouse", "false");
             return TaiChiResponse.binary(
                     RenderHelper.renderPlayer(
                             Integer.parseInt(width),
                             Integer.parseInt(height),
                             Float.parseFloat(scale),
-                            true
+                            true,
+                            Boolean.parseBoolean(followMouse)
                     ), type);
         }
         if (argument.equals("item")) {

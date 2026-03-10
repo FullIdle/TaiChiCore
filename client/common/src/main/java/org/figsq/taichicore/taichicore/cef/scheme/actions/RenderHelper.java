@@ -80,27 +80,35 @@ public final class RenderHelper {
         return task.get();
     }
 
-    public static byte[] renderPlayer(int width, int height, float entitySize, boolean png) {
-        return ensureRenderThread(() -> doRenderPlayer(width, height, entitySize, png));
+    public static byte[] renderPlayer(int width, int height, float entitySize, boolean png, boolean followMouse) {
+        return ensureRenderThread(() -> doRenderPlayer(width, height, entitySize, png, followMouse));
     }
 
-    private static byte[] doRenderPlayer(int width, int height, float entitySize, boolean png) {
+    private static byte[] doRenderPlayer(int width, int height, float entitySize, boolean png, boolean followMouse) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (player == null) return new byte[0];
 
-        // 获取鼠标坐标
-        double winScale = mc.getWindow().getGuiScale();
-        float mouseX = (float) (mc.mouseHandler.xpos() / winScale);
-        float mouseY = (float) (mc.mouseHandler.ypos() / winScale);
+        float centerX = width / 2f;
+        float centerY = height / 2f;
 
-        // 屏幕尺寸
-        float screenW = mc.getWindow().getGuiScaledWidth();
-        float screenH = mc.getWindow().getGuiScaledHeight();
+        float p = 0f;
+        float q = 0f;
 
-        // 把鼠标坐标从屏幕空间映射到FBO空间
-        float fboMouseX = (mouseX / screenW) * width;
-        float fboMouseY = (mouseY / screenH) * height;
+        if (followMouse) {
+            double winScale = mc.getWindow().getGuiScale();
+            float mouseX = (float) (mc.mouseHandler.xpos() / winScale);
+            float mouseY = (float) (mc.mouseHandler.ypos() / winScale);
+
+            float screenW = mc.getWindow().getGuiScaledWidth();
+            float screenH = mc.getWindow().getGuiScaledHeight();
+
+            float fboMouseX = (mouseX / screenW) * width;
+            float fboMouseY = (mouseY / screenH) * height;
+
+            p = (float) Math.atan((centerX - fboMouseX) / 40.0f);
+            q = (float) Math.atan((centerY - fboMouseY) / 40.0f);
+        }
 
         RenderTarget fbo = new TextureTarget(width, height, true, Minecraft.ON_OSX);
         fbo.setClearColor(0f, 0f, 0f, 0f);
@@ -116,19 +124,12 @@ public final class RenderHelper {
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
         GuiGraphics guiGraphics = new GuiGraphics(mc, bufferSource);
 
-        float centerX = width / 2f;
-        float centerY = height / 2f;
         int scale = (int) (height * 0.5f * entitySize);
-
-        // 复刻 renderEntityInInventoryFollowsMouse 的鼠标计算逻辑
-        float p = (float) Math.atan((centerX - fboMouseX) / 40.0f);
-        float q = (float) Math.atan((centerY - fboMouseY) / 40.0f);
 
         Quaternionf quaternionf  = new Quaternionf().rotateZ((float) Math.PI);
         Quaternionf quaternionf2 = new Quaternionf().rotateX(q * 20.0f * (float)(Math.PI / 180f));
         quaternionf.mul(quaternionf2);
 
-        // 保存并设置旋转字段
         float savedYBodyRot  = player.yBodyRot;
         float savedYRot      = player.getYRot();
         float savedXRot      = player.getXRot();
@@ -144,7 +145,6 @@ public final class RenderHelper {
         float w = player.getScale();
         Vector3f offset = new Vector3f(0f, player.getBbHeight() / 2.0f * w, 0f);
 
-        // 直接调用不带scissor的版本
         InventoryScreen.renderEntityInInventory(
                 guiGraphics,
                 centerX, centerY,
@@ -157,7 +157,6 @@ public final class RenderHelper {
 
         bufferSource.endBatch();
 
-        // 还原旋转字段
         player.yBodyRot  = savedYBodyRot;
         player.setYRot(savedYRot);
         player.setXRot(savedXRot);
