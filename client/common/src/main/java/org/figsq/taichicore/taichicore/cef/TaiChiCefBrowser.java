@@ -79,6 +79,7 @@ public class TaiChiCefBrowser extends CefBrowserOsr {
     @Override
     public synchronized void onBeforeClose() {
         super.onBeforeClose();
+        this.clearRenderNotice();
         TaiChiCefUtil.removeBrowser(this);
     }
 
@@ -259,18 +260,21 @@ public class TaiChiCefBrowser extends CefBrowserOsr {
 
     public void addRenderNotice(RenderNoticeHandler.NoticeContext context) {
         synchronized (this.RENDER_NOTICE_CONTEXTS) {
-            this.RENDER_NOTICE_CONTEXTS.put(context.queryId, context);
+            val old = this.RENDER_NOTICE_CONTEXTS.put(context.queryId, context);
+            if (old != null) old.cleanup();
         }
     }
 
     public void removeRenderNotice(long queryId) {
         synchronized (this.RENDER_NOTICE_CONTEXTS) {
-            this.RENDER_NOTICE_CONTEXTS.remove(queryId);
+            RenderNoticeHandler.NoticeContext ctx = this.RENDER_NOTICE_CONTEXTS.remove(queryId);
+            if (ctx != null) ctx.cleanup();
         }
     }
 
     public void clearRenderNotice() {
         synchronized (this.RENDER_NOTICE_CONTEXTS) {
+            this.RENDER_NOTICE_CONTEXTS.values().forEach(RenderNoticeHandler.NoticeContext::cleanup);
             this.RENDER_NOTICE_CONTEXTS.clear();
         }
     }

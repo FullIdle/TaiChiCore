@@ -3,8 +3,11 @@ console.log("use taichi.js")
 window.taichi = function (
     params,
     {
-        onSuccess = () => {},
-        onFailure = (code, msg) => { console.error(code, msg) },
+        onSuccess = () => {
+        },
+        onFailure = (code, msg) => {
+            console.error(code, msg)
+        },
         persistent = false
     } = {}
 ) {
@@ -98,11 +101,13 @@ customElements.define("taichi-render", class extends HTMLElement {
         };
 
         switch (type) {
-            case "player": {
+            case "player" :
+            case "entity" : {
                 params.width = width;
                 params.height = height;
                 params.scale = this.getAttribute("scale") || "1.0";
                 params.follow_mouse = this.getAttribute("follow_mouse") || "false";
+                if (type === "entity") params.entity_id = this.getAttribute("entity_id") || "-1";
                 break;
             }
             case "item": {
@@ -144,7 +149,7 @@ customElements.define("taichi-render", class extends HTMLElement {
         }
 
         const binary = atob(base64);
-        const bytes  = new Uint8ClampedArray(binary.length);
+        const bytes = new Uint8ClampedArray(binary.length);
         for (let i = 0; i < binary.length; i++) {
             bytes[i] = binary.charCodeAt(i);
         }
