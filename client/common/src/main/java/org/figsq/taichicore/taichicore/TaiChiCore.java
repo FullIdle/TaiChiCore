@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.commands.CommandSourceStack;
 import org.figsq.taichicore.taichicore.comm.ModCommManager;
+import org.figsq.taichicore.taichicore.common.comm.packets.common.CustomPacket;
 import org.figsq.taichicore.taichicore.screen.TaiChiScreen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleScriptContext;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static net.minecraft.commands.Commands.argument;
@@ -101,8 +103,9 @@ public abstract class TaiChiCore {
      */
     public <T extends ScriptContext> T addTaiChiAttributes(T context) {
         val scope = ScriptContext.ENGINE_SCOPE;
-        context.setAttribute("minecraft", Minecraft.getInstance(), scope);
-        val player = Minecraft.getInstance().player;
+        val minecraft = Minecraft.getInstance();
+        context.setAttribute("minecraft", minecraft, scope);
+        val player = minecraft.player;
         context.setAttribute("player", player, scope);
         context.setAttribute("command",
                 (Consumer<String>) s -> {
@@ -114,6 +117,16 @@ public abstract class TaiChiCore {
                 (Consumer<String>) s -> {
                     if (player != null) player.connection.sendChat(s);
                 },
+                scope
+        );
+        context.setAttribute(
+                "resourcePackDirPath",
+                minecraft.getResourcePackDirectory(),
+                scope
+        );
+        context.setAttribute(
+                "packet",
+                (BiConsumer<String, String>) (identifier, data) -> ModCommManager.INSTANCE.sendTo(null, new CustomPacket(identifier, data)),
                 scope
         );
         return context;
