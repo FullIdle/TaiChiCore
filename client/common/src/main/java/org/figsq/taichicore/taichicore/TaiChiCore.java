@@ -102,7 +102,20 @@ public abstract class TaiChiCore {
     public <T extends ScriptContext> T addTaiChiAttributes(T context) {
         val scope = ScriptContext.ENGINE_SCOPE;
         context.setAttribute("minecraft", Minecraft.getInstance(), scope);
-        context.setAttribute("player", Minecraft.getInstance().player, scope);
+        val player = Minecraft.getInstance().player;
+        context.setAttribute("player", player, scope);
+        context.setAttribute("command",
+                (Consumer<String>) s -> {
+                    if (player != null) player.connection.sendCommand(s);
+                },
+                scope
+        );
+        context.setAttribute("chat",
+                (Consumer<String>) s -> {
+                    if (player != null) player.connection.sendChat(s);
+                },
+                scope
+        );
         return context;
     }
 }

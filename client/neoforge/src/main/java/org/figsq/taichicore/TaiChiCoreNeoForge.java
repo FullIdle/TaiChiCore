@@ -42,7 +42,7 @@ public class TaiChiCoreNeoForge extends TaiChiCore {
     private void onRegisterGuiLayer(RegisterGuiLayersEvent event) {
         val id = ResourceLocation.tryBuild("taichicore", "hub");
         assert id != null;
-        event.registerAboveAll(id, this::renderHUD);
+        event.registerAboveAll(id, TaiChiCore::renderHUD);
     }
 
     @Override
