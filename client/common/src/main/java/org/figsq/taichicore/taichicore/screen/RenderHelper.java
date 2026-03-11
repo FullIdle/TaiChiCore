@@ -11,8 +11,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 import org.figsq.taichicore.taichicore.cef.handler.query.RenderNoticeHandler;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -95,11 +98,18 @@ public final class RenderHelper {
         return renderEntity(-1, width, height, entitySize, png, followMouse);
     }
 
+    private static Entity hitEntity(Minecraft mc) {
+        val rs = mc.hitResult;
+        if (rs == null) return null;
+        if (rs.getType() != HitResult.Type.ENTITY) return null;
+        return ((EntityHitResult) rs).getEntity();
+    }
+
     private static byte[] doRenderEntity(int entityId, int width, int height, float entitySize, boolean png, boolean followMouse) {
         Minecraft mc = Minecraft.getInstance();
         val level = mc.level;
         if (level == null) return new byte[0];
-        val entity = entityId == -1 ? mc.player : level.getEntity(entityId);
+        val entity = entityId == -1 ? mc.player : entityId == -999 ? hitEntity(mc) : level.getEntity(entityId);
         if (!(entity instanceof LivingEntity)) return new byte[0];
         val lent = ((LivingEntity) entity);
 
@@ -276,7 +286,7 @@ public final class RenderHelper {
         Minecraft mc = Minecraft.getInstance();
         val level = mc.level;
         if (level == null) return new byte[0];
-        val entity = entityId == -1 ? mc.player : level.getEntity(entityId);
+        val entity = entityId == -1 ? mc.player : entityId == -999 ? hitEntity(mc) : level.getEntity(entityId);
         if (!(entity instanceof LivingEntity)) return new byte[0];
         val lent = ((LivingEntity) entity);
 
