@@ -82,10 +82,35 @@
 <!--实时渲染玩家组件 画布-->
 <taichi-render class="player" type="player" width="146" height="146" scale="0.8" follow_mouse="false"></taichi-render>
 <!--entity_id -1 时为客户端玩家自己本身-->
-<taichi-render class="player" type="entity" width="146" height="146" scale="0.8" follow_mouse="true" entity_id="-1"></taichi-render>
-<taichi-render class="player" type="entity" width="146" height="146" scale="0.8" follow_mouse="true" entity_id="-999"></taichi-render>
+<taichi-render class="player" type="entity" width="146" height="146" scale="0.8" follow_mouse="true"
+               entity_id="-1"></taichi-render>
+<taichi-render class="player" type="entity" width="146" height="146" scale="0.8" follow_mouse="true"
+               entity_id="-999"></taichi-render>
 <taichi-render class="item" type="item" width="64" height="64"></taichi-render>
 </body>
 <script>
+    taichi({
+        action: 'js',
+        script: `
+            function hitEntity() {
+                var rs = minecraft.hitResult;
+                if (rs == null || !rs.getType().name().contains("ENTITY")) return 0;
+                return rs.getEntity().getId();
+            }
+            hitEntity();
+        `
+    }, {
+        onSuccess: (data) => {
+            const el = document.createElement('taichi-render');
+            el.className = 'player';
+            el.setAttribute('type', 'entity');
+            el.setAttribute('width', '146');
+            el.setAttribute('height', '146');
+            el.setAttribute('scale', '0.8');
+            el.setAttribute('follow_mouse', 'true');
+            el.setAttribute('entity_id', data);
+            document.body.appendChild(el);
+        }
+    })
 </script>
 </html>

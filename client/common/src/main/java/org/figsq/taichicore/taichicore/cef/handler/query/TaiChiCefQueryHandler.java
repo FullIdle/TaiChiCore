@@ -76,6 +76,7 @@ public class TaiChiCefQueryHandler extends CefMessageRouterHandlerAdapter {
                 "evalJS",
                 "js",
                 "javascript",
+                "JavaScript",
                 "js脚本",
                 "执行js脚本"
         );

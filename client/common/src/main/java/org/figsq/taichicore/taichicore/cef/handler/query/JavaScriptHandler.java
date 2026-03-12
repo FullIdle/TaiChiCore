@@ -10,6 +10,9 @@ import org.cef.callback.CefQueryCallback;
 import org.figsq.taichicore.taichicore.TaiChiCore;
 import org.jetbrains.annotations.NotNull;
 
+import javax.script.ScriptContext;
+import java.util.function.Consumer;
+
 @Getter
 @Setter
 public class JavaScriptHandler implements QueryHandler {
@@ -20,7 +23,15 @@ public class JavaScriptHandler implements QueryHandler {
         val script = source.get("script").getAsString();
         if (script == null || script.isEmpty()) throw new RuntimeException("script is null");
         try {
-            return String.valueOf(TaiChiCore.INSTANCE.evalScript(script));
+            return String.valueOf(TaiChiCore.INSTANCE.evalScript(script, context -> {
+                context.setAttribute("browser", browser, ScriptContext.ENGINE_SCOPE);
+
+                context.setAttribute(
+                        "execJS",
+                        (Consumer<String>) s -> browser.executeJavaScript(s, "", 0),
+                        ScriptContext.ENGINE_SCOPE
+                );
+            }));
         } catch (Exception e) {
             throw new RuntimeException("eval script error " + e.getMessage());
         }
