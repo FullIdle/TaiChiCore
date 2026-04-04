@@ -21,7 +21,7 @@ public class TaiChiCoreFabric extends TaiChiCore implements ModInitializer {
     public void onInitialize() {
         this.init();
         CommandRegistrationCallback.EVENT.register((a, b, c) -> a.register(CMD));
-        HudRenderCallback.EVENT.register(this::renderHUD);
+        HudRenderCallback.EVENT.register(TaiChiCoreFabric::renderHUD);
     }
 
     @Override

@@ -8,13 +8,18 @@ import org.cef.callback.CefSchemeRegistrar;
 import org.cef.handler.CefAppHandlerAdapter;
 import org.figsq.taichicore.taichicore.TaiChiCore;
 import org.figsq.taichicore.taichicore.cef.handler.TaiChiCefDisplayHandler;
-import org.figsq.taichicore.taichicore.cef.scheme.TaiChiResourceHandler;
 import org.figsq.taichicore.taichicore.cef.handler.query.TaiChiCefQueryHandler;
+import org.figsq.taichicore.taichicore.cef.scheme.TaiChiResourceHandler;
 
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class TaiChiCefUtil {
@@ -59,11 +64,20 @@ public class TaiChiCefUtil {
 
         System.setProperty(LIB_PATH_KEY, libPath.toString());
 
-        SystemBootstrap.setLoader(libname -> {
+        SystemBootstrap.setLoader(libName -> {
+            val formatLibName = formatLibName(libName);
+            Path srcPath = libPath.resolve(formatLibName);
+
+            TaiChiCore.LOGGER.info("Loading lib {} from {}", libName, srcPath);
+
             try {
-                System.load(libPath.resolve(libname + ".dll").toString());
+                System.load(srcPath.toString());
             } catch (UnsatisfiedLinkError e) {
-                System.loadLibrary(libname);
+                try {
+                    System.loadLibrary(libName);
+                } catch (Exception ig) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -160,8 +174,10 @@ public class TaiChiCefUtil {
         return browser;
     }
 
-    public static String getOSLibName() {
-        if (OS.isWindows()) return "win64";
+    public static String formatLibName(String libName) {
+        if (OS.isWindows()) return libName + ".dll";
+        if (OS.isLinux()) return "lib" + libName + ".so";
+        if (OS.isMacintosh()) return libName + ".dylib";
         throw new UnsupportedOperationException("Unsupported OS: " + OS.getOSType().name());
     }
 
