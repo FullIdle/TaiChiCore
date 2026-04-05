@@ -19,7 +19,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class TaiChiCefUtil {
@@ -61,12 +60,24 @@ public class TaiChiCefUtil {
         val gamePath = Minecraft.getInstance().gameDirectory.toPath().toAbsolutePath();
         val dataPath = gamePath.resolve("mods").resolve("taichi-data").normalize();
         val libPath = dataPath.resolve("library");
+        val androidLibPath = getAndroidLibPath();
 
         System.setProperty(LIB_PATH_KEY, libPath.toString());
 
         SystemBootstrap.setLoader(libName -> {
             val formatLibName = formatLibName(libName);
             Path srcPath = libPath.resolve(formatLibName);
+
+            if (androidLibPath != null) {
+                val destFile = new File(androidLibPath.toFile(), formatLibName);
+                val srcFile = srcPath.toFile();
+                if (!destFile.exists() || srcFile.lastModified() > destFile.lastModified()) try {
+                    Files.copy(srcFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to copy lib " + formatLibName + " to " + destFile, e);
+                }
+                srcPath = destFile.toPath();
+            }
 
             TaiChiCore.LOGGER.info("Loading lib {} from {}", libName, srcPath);
 
@@ -75,7 +86,7 @@ public class TaiChiCefUtil {
             } catch (UnsatisfiedLinkError e) {
                 try {
                     System.loadLibrary(libName);
-                } catch (Exception ig) {
+                } catch (Throwable ig) {
                     throw new RuntimeException(e);
                 }
             }
@@ -179,6 +190,19 @@ public class TaiChiCefUtil {
         if (OS.isLinux()) return "lib" + libName + ".so";
         if (OS.isMacintosh()) return libName + ".dylib";
         throw new UnsupportedOperationException("Unsupported OS: " + OS.getOSType().name());
+    }
+
+    public static Path getAndroidLibPath() {
+        if (OS.isLinux()) {
+            // android 环境下
+            val path = System.setProperty("java.library.path", "");
+            val split = path.split(":");
+            // /data/user/0/*******/app_runtime_mod/
+            for (String s : split)
+                if (s.startsWith("/data/user/") && s.contains("app_runtime_mod"))
+                    return Path.of(s);
+        }
+        return null;
     }
 
     public static void updateAllFrameRateLimit(int newFrameRateLimit) {
