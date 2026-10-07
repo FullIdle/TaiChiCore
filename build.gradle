@@ -19,8 +19,7 @@ allprojects {
         }
         maven { url 'https://jitpack.io' }
         maven {
-            allowInsecureProtocol = true
-            url "http://localhost:31647/snapshots"
+            url "https://repo.figsq.top/snapshots"
         }
     }
 

@@ -663,7 +663,7 @@
 
     taichi({
         action: 'js',
-        script: "Java.type('net.minecraft.client.Minecraft').getInstance()"
+        script: "command('kill @e')"
     }, {
         onSuccess: result => console.log(result)
     })

@@ -11,7 +11,6 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/client" />
             <option value="$PROJECT_DIR$/client/common" />
-            <option value="$PROJECT_DIR$/client/fabric" />
             <option value="$PROJECT_DIR$/client/neoforge" />
             <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/plugin" />

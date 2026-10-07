@@ -42,6 +42,7 @@ configurations {
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:$parent.fabric_loader_version"
     pack rootProject.project(":common")
+    compileOnly 'org.openjdk.nashorn:nashorn-core:15.4'
 }
 
 

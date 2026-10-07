@@ -10,6 +10,8 @@ import net.minecraft.commands.CommandSourceStack;
 import org.figsq.taichicore.taichicore.comm.ModCommManager;
 import org.figsq.taichicore.taichicore.common.comm.packets.common.CustomPacket;
 import org.figsq.taichicore.taichicore.screen.TaiChiScreen;
+import org.figsq.taichicore.taichicore.screen.gui.GuiScreen;
+import org.figsq.taichicore.taichicore.screen.gui.GuiScreenDemo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +41,11 @@ public abstract class TaiChiCore {
                     })))
                     .then(literal("closehud").executes(context -> {
                         TaiChiCore.renderHUD = false;
+                        return 1;
+                    }))
+                    .then(literal("guidemo").executes(context -> {
+                        val minecraft = Minecraft.getInstance();
+                        minecraft.execute(() -> minecraft.setScreen(new GuiScreenDemo()));
                         return 1;
                     }));
     public static TaiChiCore INSTANCE;

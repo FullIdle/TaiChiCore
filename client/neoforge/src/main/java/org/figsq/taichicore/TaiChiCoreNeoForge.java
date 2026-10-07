@@ -1,5 +1,6 @@
 package org.figsq.taichicore;
 
+import jdk.dynalink.beans.StaticClass;
 import lombok.val;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
